@@ -58,17 +58,27 @@ object SessionCache {
                     penanganan = (m["penanganan"] as? List<*>)?.map { it.toString() } ?: emptyList()
                 )
             }
-            inline fun <reified T> restoreList(key: String, fromMap: (Map<String, Any?>) -> T): List<T> {
+            val typeTicket = object : TypeToken<List<Map<String, Any?>>>() {}.type
+            fun restoreListTicket(key: String): List<Ticket> {
                 val json = sm.getString(key) ?: return emptyList()
-                val type = object : TypeToken<List<Map<String, Any?>>>() {}.type
-                val list: List<Map<String, Any?>> = gson.fromJson(json, type)
-                return list.map(fromMap)
+                val list: List<Map<String, Any?>> = gson.fromJson(json, typeTicket)
+                return list.map { Ticket.fromMap(it) }
             }
-            perbaikanTickets = restoreList(AppConfig.PREF_CACHE_PERBAIKAN_TICKETS) { Ticket.fromMap(it) }
-            kunjunganList    = restoreList(AppConfig.PREF_CACHE_KUNJUNGAN_LIST)    { VisitCustomer.fromMap(it) }
-            pembukaanList    = restoreList(AppConfig.PREF_CACHE_PEMBUKAAN_LIST)    { VisitCustomer.fromMap(it) }
-            ocrCustomers     = restoreList(AppConfig.PREF_CACHE_OCR_CUSTOMERS)     { Customer.fromMap(it) }
-            dapellCustomers  = restoreList(AppConfig.PREF_CACHE_DAPELL_CUSTOMERS)  { Customer.fromMap(it) }
+            fun restoreListVisit(key: String): List<VisitCustomer> {
+                val json = sm.getString(key) ?: return emptyList()
+                val list: List<Map<String, Any?>> = gson.fromJson(json, typeTicket)
+                return list.map { VisitCustomer.fromMap(it) }
+            }
+            fun restoreListCustomer(key: String): List<Customer> {
+                val json = sm.getString(key) ?: return emptyList()
+                val list: List<Map<String, Any?>> = gson.fromJson(json, typeTicket)
+                return list.map { Customer.fromMap(it) }
+            }
+            perbaikanTickets = restoreListTicket(AppConfig.PREF_CACHE_PERBAIKAN_TICKETS)
+            kunjunganList    = restoreListVisit(AppConfig.PREF_CACHE_KUNJUNGAN_LIST)
+            pembukaanList    = restoreListVisit(AppConfig.PREF_CACHE_PEMBUKAAN_LIST)
+            ocrCustomers     = restoreListCustomer(AppConfig.PREF_CACHE_OCR_CUSTOMERS)
+            dapellCustomers  = restoreListCustomer(AppConfig.PREF_CACHE_DAPELL_CUSTOMERS)
             everPreloaded = true
         } catch (_: Exception) {}
     }

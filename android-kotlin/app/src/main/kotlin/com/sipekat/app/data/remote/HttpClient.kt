@@ -9,13 +9,16 @@ import okhttp3.*
 import java.net.SocketTimeoutException
 import java.util.concurrent.TimeUnit
 
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+
 class ApiException(message: String)   : Exception(message)
 class ServerException(message: String): Exception(message)
 
 /** Shared OkHttp helper — semua repository pakai ini */
 object HttpClient {
     val gson = Gson()
-    val jsonType: MediaType = MediaType.parse("application/json; charset=utf-8")!!
+    val jsonType: MediaType = "application/json; charset=utf-8".toMediaTypeOrNull()!!
 
     val default: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(AppConfig.CONNECTION_TIMEOUT_SEC, TimeUnit.SECONDS)
@@ -34,7 +37,7 @@ object HttpClient {
         val jsonBody = gson.toJson(body)
         val request  = Request.Builder()
             .url(url)
-            .post(RequestBody.create(jsonType, jsonBody))
+            .post(jsonBody.toRequestBody(jsonType))
             .build()
 
         val response = try {
@@ -46,9 +49,9 @@ object HttpClient {
         }
 
         if (!response.isSuccessful)
-            throw ApiException("Server merespon status ${response.code()}. Coba lagi.")
+            throw ApiException("Server merespon status ${response.code}. Coba lagi.")
 
-        val bodyStr = response.body()?.string()
+        val bodyStr = response.body?.string()
             ?: throw ApiException("Response body kosong.")
 
         if (bodyStr.trim().startsWith("<"))
@@ -75,7 +78,7 @@ object HttpClient {
             throw ApiException("Tidak ada koneksi internet.")
         }
         if (!response.isSuccessful)
-            throw ApiException("Server merespon status ${response.code()}.")
-        response.body()?.string() ?: ""
+            throw ApiException("Server merespon status ${response.code}.")
+        response.body?.string() ?: ""
     }
 }
