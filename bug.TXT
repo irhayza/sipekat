@@ -1,0 +1,1 @@
+saya temukan bug, bahwa tiket dengan id pelanggan yg pengaduanya open, ketika saya laporkan kirim pengaduan hasilnya tiket baru terbentuk dan ada laporan baru yg seharusnya tidak boleh, meskipun tadi saat saya mengetik id pelanggan sudah ada pemberitahuan bahwa ada tiket yg masih open. harapan saya tidak bisa dilakukan laporan baru ketika ada id pelanggan dengan tiket open
