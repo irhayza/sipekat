@@ -4,6 +4,7 @@ package com.sipekat.app.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,6 +21,9 @@ public final class ItemCustomerBinding implements ViewBinding {
   private final CardView rootView;
 
   @NonNull
+  public final Button btnScan;
+
+  @NonNull
   public final TextView tvAlamat;
 
   @NonNull
@@ -28,12 +32,22 @@ public final class ItemCustomerBinding implements ViewBinding {
   @NonNull
   public final TextView tvNama;
 
-  private ItemCustomerBinding(@NonNull CardView rootView, @NonNull TextView tvAlamat,
-      @NonNull TextView tvIdpel, @NonNull TextView tvNama) {
+  @NonNull
+  public final TextView tvNometer;
+
+  @NonNull
+  public final TextView tvStlalu;
+
+  private ItemCustomerBinding(@NonNull CardView rootView, @NonNull Button btnScan,
+      @NonNull TextView tvAlamat, @NonNull TextView tvIdpel, @NonNull TextView tvNama,
+      @NonNull TextView tvNometer, @NonNull TextView tvStlalu) {
     this.rootView = rootView;
+    this.btnScan = btnScan;
     this.tvAlamat = tvAlamat;
     this.tvIdpel = tvIdpel;
     this.tvNama = tvNama;
+    this.tvNometer = tvNometer;
+    this.tvStlalu = tvStlalu;
   }
 
   @Override
@@ -63,6 +77,12 @@ public final class ItemCustomerBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.btn_scan;
+      Button btnScan = ViewBindings.findChildViewById(rootView, id);
+      if (btnScan == null) {
+        break missingId;
+      }
+
       id = R.id.tv_alamat;
       TextView tvAlamat = ViewBindings.findChildViewById(rootView, id);
       if (tvAlamat == null) {
@@ -81,7 +101,20 @@ public final class ItemCustomerBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ItemCustomerBinding((CardView) rootView, tvAlamat, tvIdpel, tvNama);
+      id = R.id.tv_nometer;
+      TextView tvNometer = ViewBindings.findChildViewById(rootView, id);
+      if (tvNometer == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_stlalu;
+      TextView tvStlalu = ViewBindings.findChildViewById(rootView, id);
+      if (tvStlalu == null) {
+        break missingId;
+      }
+
+      return new ItemCustomerBinding((CardView) rootView, btnScan, tvAlamat, tvIdpel, tvNama,
+          tvNometer, tvStlalu);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

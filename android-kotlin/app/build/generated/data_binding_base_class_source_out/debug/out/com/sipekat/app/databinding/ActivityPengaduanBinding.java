@@ -55,12 +55,15 @@ public final class ActivityPengaduanBinding implements ViewBinding {
   @NonNull
   public final TextView tvCustomerInfo;
 
+  @NonNull
+  public final TextView tvPetugasName;
+
   private ActivityPengaduanBinding(@NonNull CoordinatorLayout rootView, @NonNull Button btnSubmit,
       @NonNull TextInputEditText etIdpel, @NonNull TextInputEditText etKeterangan,
       @NonNull TextInputEditText etNamaPelapor, @NonNull TextInputEditText etNoHp,
       @NonNull ProgressBar progressBar, @NonNull Spinner spinnerKategori,
-      @NonNull TextInputLayout tilIdpel, @NonNull Toolbar toolbar,
-      @NonNull TextView tvCustomerInfo) {
+      @NonNull TextInputLayout tilIdpel, @NonNull Toolbar toolbar, @NonNull TextView tvCustomerInfo,
+      @NonNull TextView tvPetugasName) {
     this.rootView = rootView;
     this.btnSubmit = btnSubmit;
     this.etIdpel = etIdpel;
@@ -72,6 +75,7 @@ public final class ActivityPengaduanBinding implements ViewBinding {
     this.tilIdpel = tilIdpel;
     this.toolbar = toolbar;
     this.tvCustomerInfo = tvCustomerInfo;
+    this.tvPetugasName = tvPetugasName;
   }
 
   @Override
@@ -161,9 +165,15 @@ public final class ActivityPengaduanBinding implements ViewBinding {
         break missingId;
       }
 
+      id = R.id.tv_petugas_name;
+      TextView tvPetugasName = ViewBindings.findChildViewById(rootView, id);
+      if (tvPetugasName == null) {
+        break missingId;
+      }
+
       return new ActivityPengaduanBinding((CoordinatorLayout) rootView, btnSubmit, etIdpel,
           etKeterangan, etNamaPelapor, etNoHp, progressBar, spinnerKategori, tilIdpel, toolbar,
-          tvCustomerInfo);
+          tvCustomerInfo, tvPetugasName);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

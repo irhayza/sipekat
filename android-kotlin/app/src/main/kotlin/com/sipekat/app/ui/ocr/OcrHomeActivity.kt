@@ -95,8 +95,12 @@ class CustomerAdapter(
     inner class ViewHolder(private val binding: ItemCustomerBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(c: Customer) {
             binding.tvNama.text = c.nama
-            binding.tvIdpel.text = "ID: ${c.noPelanggan}"
-            binding.tvAlamat.text = c.alamat ?: "-"
+            binding.tvIdpel.text = "IDPEL: ${c.noPelanggan}"
+            binding.tvAlamat.text = "Alamat: ${c.alamat ?: "-"}"
+            binding.tvNometer.text = "No. Meter: ${if (c.noMeter.isNullOrEmpty()) "-" else c.noMeter}"
+            binding.tvStlalu.text = "St Lalu: ${c.standBulanLalu ?: c.standAwal}"
+            
+            binding.btnScan.setOnClickListener { onClick(c) }
             binding.root.setOnClickListener { onClick(c) }
         }
     }

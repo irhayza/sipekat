@@ -4,14 +4,14 @@ package com.sipekat.app.databinding;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
-import com.google.android.material.appbar.AppBarLayout;
 import com.sipekat.app.R;
 import java.lang.NullPointerException;
 import java.lang.Override;
@@ -19,10 +19,7 @@ import java.lang.String;
 
 public final class ActivityKunjunganDashboardBinding implements ViewBinding {
   @NonNull
-  private final ConstraintLayout rootView;
-
-  @NonNull
-  public final AppBarLayout appbar;
+  private final CoordinatorLayout rootView;
 
   @NonNull
   public final CardView cardKunjungan;
@@ -33,19 +30,30 @@ public final class ActivityKunjunganDashboardBinding implements ViewBinding {
   @NonNull
   public final Toolbar toolbar;
 
-  private ActivityKunjunganDashboardBinding(@NonNull ConstraintLayout rootView,
-      @NonNull AppBarLayout appbar, @NonNull CardView cardKunjungan,
-      @NonNull CardView cardPembukaan, @NonNull Toolbar toolbar) {
+  @NonNull
+  public final TextView tvUserInitial;
+
+  @NonNull
+  public final TextView tvUserName;
+
+  @NonNull
+  public final TextView tvUserRole;
+
+  private ActivityKunjunganDashboardBinding(@NonNull CoordinatorLayout rootView,
+      @NonNull CardView cardKunjungan, @NonNull CardView cardPembukaan, @NonNull Toolbar toolbar,
+      @NonNull TextView tvUserInitial, @NonNull TextView tvUserName, @NonNull TextView tvUserRole) {
     this.rootView = rootView;
-    this.appbar = appbar;
     this.cardKunjungan = cardKunjungan;
     this.cardPembukaan = cardPembukaan;
     this.toolbar = toolbar;
+    this.tvUserInitial = tvUserInitial;
+    this.tvUserName = tvUserName;
+    this.tvUserRole = tvUserRole;
   }
 
   @Override
   @NonNull
-  public ConstraintLayout getRoot() {
+  public CoordinatorLayout getRoot() {
     return rootView;
   }
 
@@ -70,12 +78,6 @@ public final class ActivityKunjunganDashboardBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
-      id = R.id.appbar;
-      AppBarLayout appbar = ViewBindings.findChildViewById(rootView, id);
-      if (appbar == null) {
-        break missingId;
-      }
-
       id = R.id.card_kunjungan;
       CardView cardKunjungan = ViewBindings.findChildViewById(rootView, id);
       if (cardKunjungan == null) {
@@ -94,8 +96,26 @@ public final class ActivityKunjunganDashboardBinding implements ViewBinding {
         break missingId;
       }
 
-      return new ActivityKunjunganDashboardBinding((ConstraintLayout) rootView, appbar,
-          cardKunjungan, cardPembukaan, toolbar);
+      id = R.id.tv_user_initial;
+      TextView tvUserInitial = ViewBindings.findChildViewById(rootView, id);
+      if (tvUserInitial == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_user_name;
+      TextView tvUserName = ViewBindings.findChildViewById(rootView, id);
+      if (tvUserName == null) {
+        break missingId;
+      }
+
+      id = R.id.tv_user_role;
+      TextView tvUserRole = ViewBindings.findChildViewById(rootView, id);
+      if (tvUserRole == null) {
+        break missingId;
+      }
+
+      return new ActivityKunjunganDashboardBinding((CoordinatorLayout) rootView, cardKunjungan,
+          cardPembukaan, toolbar, tvUserInitial, tvUserName, tvUserRole);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

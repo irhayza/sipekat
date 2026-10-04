@@ -6,6 +6,7 @@ color brand
 color brand_dark
 color brand_light
 color canvas
+color color_kunjungan
 color color_meter
 color color_pengaduan
 color color_perbaikan
@@ -18,9 +19,12 @@ color surface
 color warning
 drawable bg_circle_icon
 drawable bg_gradient_header
+drawable bg_gradient_kunjungan
+drawable bg_gradient_pembukaan
 drawable bg_icon_meter
 drawable bg_icon_pengaduan
 drawable bg_icon_perbaikan
+drawable bg_kunjungan_header
 drawable bg_status_badge
 drawable bg_version_badge
 drawable bg_viewfinder
@@ -39,6 +43,7 @@ id btn_change_password
 id btn_login
 id btn_logout
 id btn_retake
+id btn_scan
 id btn_submit
 id card_kunjungan
 id card_meter
@@ -84,11 +89,17 @@ id tv_idpel
 id tv_kendala
 id tv_loading_stage
 id tv_nama
+id tv_nometer
 id tv_nomgrt
+id tv_petugas_name
 id tv_rupiah
 id tv_stand_lalu
 id tv_status
+id tv_stlalu
 id tv_ticket_no
+id tv_user_initial
+id tv_user_name
+id tv_user_role
 id tv_version
 id tv_welcome_name
 id view_finder
