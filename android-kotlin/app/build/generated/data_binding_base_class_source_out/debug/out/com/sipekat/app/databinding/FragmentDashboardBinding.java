@@ -5,12 +5,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.viewbinding.ViewBinding;
 import androidx.viewbinding.ViewBindings;
 import com.sipekat.app.R;
@@ -20,7 +20,7 @@ import java.lang.String;
 
 public final class FragmentDashboardBinding implements ViewBinding {
   @NonNull
-  private final LinearLayout rootView;
+  private final CoordinatorLayout rootView;
 
   @NonNull
   public final Button btnLogout;
@@ -46,7 +46,7 @@ public final class FragmentDashboardBinding implements ViewBinding {
   @NonNull
   public final ProgressBar warmingIndicator;
 
-  private FragmentDashboardBinding(@NonNull LinearLayout rootView, @NonNull Button btnLogout,
+  private FragmentDashboardBinding(@NonNull CoordinatorLayout rootView, @NonNull Button btnLogout,
       @NonNull CardView cardKunjungan, @NonNull CardView cardMeter, @NonNull CardView cardPengaduan,
       @NonNull CardView cardPerbaikan, @NonNull TextView tvVersion, @NonNull TextView tvWelcomeName,
       @NonNull ProgressBar warmingIndicator) {
@@ -63,7 +63,7 @@ public final class FragmentDashboardBinding implements ViewBinding {
 
   @Override
   @NonNull
-  public LinearLayout getRoot() {
+  public CoordinatorLayout getRoot() {
     return rootView;
   }
 
@@ -136,7 +136,7 @@ public final class FragmentDashboardBinding implements ViewBinding {
         break missingId;
       }
 
-      return new FragmentDashboardBinding((LinearLayout) rootView, btnLogout, cardKunjungan,
+      return new FragmentDashboardBinding((CoordinatorLayout) rootView, btnLogout, cardKunjungan,
           cardMeter, cardPengaduan, cardPerbaikan, tvVersion, tvWelcomeName, warmingIndicator);
     }
     String missingId = rootView.getResources().getResourceName(id);

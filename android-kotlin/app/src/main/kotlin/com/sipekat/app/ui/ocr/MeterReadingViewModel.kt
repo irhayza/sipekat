@@ -48,16 +48,15 @@ class MeterReadingViewModel : ViewModel() {
                 val fileName = "METER_${customerId}_${formatter.format(Date())}.jpg"
                 
                 val payload = mapOf(
-                    "action" to "submit_ocr",
+                    "action" to "sync_ocr_dapel",
                     "idpel" to customerId,
                     "petugas" to petugasNama,
-                    "stand" to stand,
+                    "hasil_ocr" to stand,
                     "catatan" to catatan,
                     "lat" to lat,
                     "lng" to lng,
-                    "bulan" to bulan,
-                    "fotoBase64" to base64,
-                    "filename" to fileName
+                    "image_base64" to base64,
+                    "file_name" to fileName
                 )
                 
                 val res = repo.postToOcr(payload)

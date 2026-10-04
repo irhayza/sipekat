@@ -1,15 +1,11 @@
 [
     {
-        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_ocr_home.xml.flat",
-        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_ocr_home.xml"
+        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_meter_reading.xml.flat",
+        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_meter_reading.xml"
     },
     {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\drawable_bg_viewfinder.xml.flat",
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\drawable\\bg_viewfinder.xml"
-    },
-    {
-        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_meter_reading.xml.flat",
-        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_meter_reading.xml"
     },
     {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_item_ticket.xml.flat",
@@ -24,12 +20,8 @@
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_main.xml"
     },
     {
-        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_pengaduan.xml.flat",
-        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_pengaduan.xml"
-    },
-    {
-        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_login.xml.flat",
-        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_login.xml"
+        "merged": "com.sipekat.app-debug-65:/drawable_bg_circle_icon.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/bg_circle_icon.xml"
     },
     {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_kunjungan_dashboard.xml.flat",
@@ -44,8 +36,8 @@
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_perbaikan.xml"
     },
     {
-        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\menu_bottom_nav_menu.xml.flat",
-        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\menu\\bottom_nav_menu.xml"
+        "merged": "com.sipekat.app-debug-65:/drawable_bg_status_badge.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/bg_status_badge.xml"
     },
     {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_item_visit_customer.xml.flat",
@@ -56,6 +48,14 @@
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\fragment_pesan.xml"
     },
     {
+        "merged": "com.sipekat.app-debug-65:/drawable_ic_speed.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/ic_speed.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_ic_build.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/ic_build.xml"
+    },
+    {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_visit_list.xml.flat",
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_visit_list.xml"
     },
@@ -64,8 +64,8 @@
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\fragment_riwayat.xml"
     },
     {
-        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_item_customer.xml.flat",
-        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\item_customer.xml"
+        "merged": "com.sipekat.app-debug-65:/drawable_ic_person.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/ic_person.xml"
     },
     {
         "merged": "com.sipekat.app-debug-65:/layout_fragment_dashboard.xml.flat",
@@ -74,5 +74,57 @@
     {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_dialog_change_password.xml.flat",
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\dialog_change_password.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_bg_icon_meter.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/bg_icon_meter.xml"
+    },
+    {
+        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_ocr_home.xml.flat",
+        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_ocr_home.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_ic_campaign.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/ic_campaign.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_ic_check_circle.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/ic_check_circle.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_bg_version_badge.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/bg_version_badge.xml"
+    },
+    {
+        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_pengaduan.xml.flat",
+        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_pengaduan.xml"
+    },
+    {
+        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_activity_login.xml.flat",
+        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_login.xml"
+    },
+    {
+        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\menu_bottom_nav_menu.xml.flat",
+        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\menu\\bottom_nav_menu.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_bg_icon_perbaikan.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/bg_icon_perbaikan.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_ic_map.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/ic_map.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_bg_gradient_header.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/bg_gradient_header.xml"
+    },
+    {
+        "merged": "com.sipekat.app-debug-65:/drawable_bg_icon_pengaduan.xml.flat",
+        "source": "com.sipekat.app-main-67:/drawable/bg_icon_pengaduan.xml"
+    },
+    {
+        "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-debug-65:\\layout_item_customer.xml.flat",
+        "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\item_customer.xml"
     }
 ]
