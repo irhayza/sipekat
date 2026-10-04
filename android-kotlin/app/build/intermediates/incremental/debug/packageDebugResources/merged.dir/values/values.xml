@@ -17,7 +17,7 @@
     <color name="surface">#FFFFFF</color>
     <color name="warning">#F59E0B</color>
     <string name="app_name">SiPEKAT</string>
-    <style name="Theme.SiPEKAT" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.SiPEKAT" parent="Theme.MaterialComponents.Light.NoActionBar">
         <item name="colorPrimary">@color/brand</item>
         <item name="colorPrimaryVariant">@color/brand_dark</item>
         <item name="colorOnPrimary">@color/surface</item>
@@ -25,5 +25,6 @@
         <item name="colorOnSecondary">@color/surface</item>
         <item name="android:colorBackground">@color/canvas</item>
         <item name="colorSurface">@color/surface</item>
+        <item name="android:statusBarColor">@color/brand</item>
     </style>
 </resources>
