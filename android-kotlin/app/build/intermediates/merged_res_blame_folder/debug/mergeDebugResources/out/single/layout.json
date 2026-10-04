@@ -44,10 +44,6 @@
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\item_ticket.xml"
     },
     {
-        "merged": "com.sipekat.app-mergeDebugResources-64:/layout/fragment_dashboard.xml",
-        "source": "com.sipekat.app-main-67:/layout/fragment_dashboard.xml"
-    },
-    {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-mergeDebugResources-64:\\layout\\activity_kunjungan_dashboard.xml",
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\activity_kunjungan_dashboard.xml"
     },
@@ -62,6 +58,10 @@
     {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-mergeDebugResources-64:\\layout\\fragment_riwayat.xml",
         "source": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-main-67:\\layout\\fragment_riwayat.xml"
+    },
+    {
+        "merged": "com.sipekat.app-mergeDebugResources-64:/layout/activity_login.xml",
+        "source": "com.sipekat.app-main-67:/layout/activity_login.xml"
     },
     {
         "merged": "C:\\Users\\lhaki\\.gradle\\daemon\\8.9\\com.sipekat.app-mergeDebugResources-64:\\layout\\fragment_pesan.xml",

@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -25,6 +25,9 @@ public final class ActivityLoginBinding implements ViewBinding {
   private final ConstraintLayout rootView;
 
   @NonNull
+  public final LinearLayout bannerError;
+
+  @NonNull
   public final Button btnLogin;
 
   @NonNull
@@ -34,7 +37,7 @@ public final class ActivityLoginBinding implements ViewBinding {
   public final TextInputEditText etUserId;
 
   @NonNull
-  public final ImageView ivPasswordToggle;
+  public final LinearLayout layoutLoading;
 
   @NonNull
   public final ProgressBar progressBar;
@@ -51,25 +54,23 @@ public final class ActivityLoginBinding implements ViewBinding {
   @NonNull
   public final TextView tvLoadingStage;
 
-  @NonNull
-  public final TextView tvTitle;
-
-  private ActivityLoginBinding(@NonNull ConstraintLayout rootView, @NonNull Button btnLogin,
+  private ActivityLoginBinding(@NonNull ConstraintLayout rootView,
+      @NonNull LinearLayout bannerError, @NonNull Button btnLogin,
       @NonNull TextInputEditText etPassword, @NonNull TextInputEditText etUserId,
-      @NonNull ImageView ivPasswordToggle, @NonNull ProgressBar progressBar,
+      @NonNull LinearLayout layoutLoading, @NonNull ProgressBar progressBar,
       @NonNull TextInputLayout tilPassword, @NonNull TextInputLayout tilUserId,
-      @NonNull TextView tvError, @NonNull TextView tvLoadingStage, @NonNull TextView tvTitle) {
+      @NonNull TextView tvError, @NonNull TextView tvLoadingStage) {
     this.rootView = rootView;
+    this.bannerError = bannerError;
     this.btnLogin = btnLogin;
     this.etPassword = etPassword;
     this.etUserId = etUserId;
-    this.ivPasswordToggle = ivPasswordToggle;
+    this.layoutLoading = layoutLoading;
     this.progressBar = progressBar;
     this.tilPassword = tilPassword;
     this.tilUserId = tilUserId;
     this.tvError = tvError;
     this.tvLoadingStage = tvLoadingStage;
-    this.tvTitle = tvTitle;
   }
 
   @Override
@@ -99,6 +100,12 @@ public final class ActivityLoginBinding implements ViewBinding {
     // This is done to optimize the compiled bytecode for size and performance.
     int id;
     missingId: {
+      id = R.id.banner_error;
+      LinearLayout bannerError = ViewBindings.findChildViewById(rootView, id);
+      if (bannerError == null) {
+        break missingId;
+      }
+
       id = R.id.btn_login;
       Button btnLogin = ViewBindings.findChildViewById(rootView, id);
       if (btnLogin == null) {
@@ -117,9 +124,9 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.iv_password_toggle;
-      ImageView ivPasswordToggle = ViewBindings.findChildViewById(rootView, id);
-      if (ivPasswordToggle == null) {
+      id = R.id.layout_loading;
+      LinearLayout layoutLoading = ViewBindings.findChildViewById(rootView, id);
+      if (layoutLoading == null) {
         break missingId;
       }
 
@@ -153,14 +160,9 @@ public final class ActivityLoginBinding implements ViewBinding {
         break missingId;
       }
 
-      id = R.id.tv_title;
-      TextView tvTitle = ViewBindings.findChildViewById(rootView, id);
-      if (tvTitle == null) {
-        break missingId;
-      }
-
-      return new ActivityLoginBinding((ConstraintLayout) rootView, btnLogin, etPassword, etUserId,
-          ivPasswordToggle, progressBar, tilPassword, tilUserId, tvError, tvLoadingStage, tvTitle);
+      return new ActivityLoginBinding((ConstraintLayout) rootView, bannerError, btnLogin,
+          etPassword, etUserId, layoutLoading, progressBar, tilPassword, tilUserId, tvError,
+          tvLoadingStage);
     }
     String missingId = rootView.getResources().getResourceName(id);
     throw new NullPointerException("Missing required view with ID: ".concat(missingId));

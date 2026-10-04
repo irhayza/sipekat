@@ -3122,6 +3122,7 @@ drawable ic_check_circle
 drawable ic_clear_black_24
 drawable ic_clock_black_24dp
 drawable ic_keyboard_black_24dp
+drawable ic_launcher
 drawable ic_m3_chip_check
 drawable ic_m3_chip_checked_circle
 drawable ic_m3_chip_close
@@ -3300,6 +3301,7 @@ id auto
 id autoComplete
 id autoCompleteToEnd
 id autoCompleteToStart
+id banner_error
 id barrier
 id baseline
 id beginOnFirstDraw
@@ -3475,12 +3477,12 @@ id inward
 id is_pooling_container_tag
 id italic
 id item_touch_helper_previous_elevation
-id iv_password_toggle
 id iv_preview
 id jumpToEnd
 id jumpToStart
 id labeled
 id layout
+id layout_loading
 id left
 id leftToRight
 id legacy
@@ -3764,7 +3766,6 @@ id tv_rupiah
 id tv_stand_lalu
 id tv_status
 id tv_ticket_no
-id tv_title
 id tv_version
 id tv_welcome_name
 id unchecked

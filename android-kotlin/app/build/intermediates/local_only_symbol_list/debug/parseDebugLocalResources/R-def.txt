@@ -27,10 +27,12 @@ drawable bg_viewfinder
 drawable ic_build
 drawable ic_campaign
 drawable ic_check_circle
+drawable ic_launcher
 drawable ic_map
 drawable ic_person
 drawable ic_speed
 id appbar
+id banner_error
 id bottom_nav
 id btn_capture
 id btn_change_password
@@ -56,8 +58,8 @@ id et_search
 id et_stand_angka
 id et_user_id
 id fragment_container
-id iv_password_toggle
 id iv_preview
+id layout_loading
 id nav_beranda
 id nav_pesan
 id nav_profil
@@ -87,7 +89,6 @@ id tv_rupiah
 id tv_stand_lalu
 id tv_status
 id tv_ticket_no
-id tv_title
 id tv_version
 id tv_welcome_name
 id view_finder

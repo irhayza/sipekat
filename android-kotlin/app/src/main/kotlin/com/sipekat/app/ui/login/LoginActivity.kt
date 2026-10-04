@@ -67,17 +67,6 @@ class LoginActivity : AppCompatActivity() {
             if (ok) checkLocationPermissionThenLogin()
         }
 
-        binding.ivPasswordToggle.setOnClickListener {
-            val isHidden = binding.etPassword.inputType == (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
-            if (isHidden) {
-                binding.etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                binding.ivPasswordToggle.setImageResource(android.R.drawable.ic_menu_view)
-            } else {
-                binding.etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-                binding.ivPasswordToggle.setImageResource(android.R.drawable.ic_menu_close_clear_cancel) // placeholders
-            }
-            binding.etPassword.setSelection(binding.etPassword.text?.length ?: 0)
-        }
     }
 
     private fun checkLocationPermissionThenLogin() {
@@ -128,17 +117,23 @@ class LoginActivity : AppCompatActivity() {
 
     private fun showErr(msg: String) {
         binding.tvError.text = msg
-        binding.tvError.visibility = View.VISIBLE
+        binding.bannerError.visibility = View.VISIBLE
     }
 
     private fun setLoading(loading: Boolean, stage: String = "") {
-        binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
-        binding.tvLoadingStage.visibility = if (loading && stage.isNotEmpty()) View.VISIBLE else View.GONE
-        binding.tvLoadingStage.text = stage
         binding.btnLogin.isEnabled = !loading
         binding.etUserId.isEnabled = !loading
         binding.etPassword.isEnabled = !loading
-        if (loading) binding.tvError.visibility = View.GONE
+        
+        if (loading) {
+            binding.layoutLoading.visibility = View.VISIBLE
+            binding.tvLoadingStage.text = stage
+            binding.bannerError.visibility = View.GONE
+            binding.btnLogin.visibility = View.GONE
+        } else {
+            binding.layoutLoading.visibility = View.GONE
+            binding.btnLogin.visibility = View.VISIBLE
+        }
     }
 
     private fun navigateToMain(nama: String, email: String) {
