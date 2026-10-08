@@ -149,7 +149,7 @@ function doPost(e) {
     }
 
     // Validasi Keamanan & Proses Webhook WAHA
-    const isWaha = !!(payload.event && payload.event.includes('message') && payload.payload);
+    const isWaha = !!(payload.event && String(payload.event).includes('message') && payload.payload);
     
     if (!isWaha) {
       const secret = getPropSafe_('WEBHOOK_SECRET'); 
@@ -407,68 +407,71 @@ function jsonOutput_(obj) {
 function processWahaUpdate_(update) {
   try {
     const payload = update.payload;
-    if (!payload || payload.fromMe === true || update.event !== 'message') return;
+    if (!payload) return;
 
-    const rawText = payload.body || payload.text || payload.message?.conversation || payload.message?.extendedTextMessage?.text || payload.message?.text || '';
+    // 1. Abaikan pesan dari bot sendiri atau broadcast
+    if (payload.fromMe === true || payload.id?.fromMe === true) return;
+    
+    // 2. Dukung semua event pesan (message, message.any, message.upsert)
+    const eventName = String(update.event || '');
+    if (!eventName.includes('message')) return;
+
+    const rawText = payload.body || payload.text || payload.message?.conversation || payload.message?.extendedTextMessage?.text || '';
     const text = normalizeText_(rawText);
     const originalText = rawText.trim();
     const from = String(payload.from || '').trim();
 
-    if (!text || from === getPropSafe_('WA_ID') || from === 'status@broadcast') return;
+    if (!text || from === 'status@broadcast') return;
 
-    // Webhook bisa dikirim ulang WAHA bila balasan GAS lambat -> jangan proses dua kali
-    if (isDuplicateWaMessage_(payload, update)) return;
+    // Cegah duplikasi webhook
+    if (typeof isDuplicateWaMessage_ === 'function' && isDuplicateWaMessage_(payload, update)) return;
 
-    const isAdmin = isAdminChat_(from);
+    const isAdmin = typeof isAdminChat_ === 'function' ? isAdminChat_(from) : false;
 
-    // Mode debug: isi Script Property DEBUG_WA = true untuk mencatat tiap pesan masuk ke sheet Log
-    if (getPropSafe_('DEBUG_WA') === 'true') {
-      LoggerService.info('WA masuk', { build: BUILD_ID_, from: from, admin: isAdmin, teks: originalText.substring(0, 40) });
+    // Log ke sheet Log
+    if (typeof LoggerService !== 'undefined') {
+      LoggerService.info('WA Masuk Diterima', { from: from, admin: isAdmin, teks: originalText.substring(0, 100) });
     }
 
-    // Cek identitas pengirim (membantu bila nomor Anda tidak dikenali sebagai admin)
-    if (text === '#id') {
-      return reply_(from, '🆔 ID WhatsApp Anda: <code>' + from + '</code>\nBuild kode: <code>' + BUILD_ID_ + '</code>\n' + (isAdmin ? 'Status: <b>ADMIN</b> (asisten aktif)' : 'Status: <b>bukan admin</b> (dilayani sebagai pelanggan)'));
-    }
-
-    // Perintah manual. Perubahan dari versi lama:
-    //  - harus diikuti '#', spasi, atau akhir teks (jadi "hitung", "tagihan", "alat"
-    //    tidak lagi salah dikira perintah hi/tag/al)
-    //  - untuk ADMIN hanya perintah berawalan '#' (atau "menu"/"help") yang dianggap
-    //    perintah manual; kalimat bebas seperti "cek tiket open di KD" masuk ke Gemini
-    const regex = /^#?(lapor|cek|al(?:amat)?|pt|petugas|ll|lokasi|koordinat|tag|open|menu|halo|hi|help|start)(?:#|\s+|$)(.*)/i;
-    const match = text.match(regex);
-    const isExplicit = originalText.charAt(0) === '#';
-    const adminMenu = isAdmin && (text === 'menu' || text === 'help');
-
-    if (match && (!isAdmin || isExplicit || adminMenu)) {
-      const command = match[1].toLowerCase(), cleanPayload = match[2].trim();
-      if (['menu', 'halo', 'hi', 'help', 'start'].includes(command)) return sendMenu_(from);
-
-      switch (command) {
-        case 'lapor': return handleLapor_(from, cleanPayload);
-        case 'cek':   return handleCek_(from, cleanPayload);
-        case 'tag':   return handleTag_(from, cleanPayload);
-        case 'open':  return handleOpen_(from, cleanPayload);
-        case 'al': case 'alamat': return handleInfo_(from, cleanPayload, 'al');
-        case 'pt': case 'petugas': return handleInfo_(from, cleanPayload, 'pt');
-        case 'll': case 'lokasi': case 'koordinat': return handleLokasiWA_(from, cleanPayload);
-      }
+    // Perintah cek ID
+    if (text === '#id' || text === 'id') {
+      reply_(from, `🆔 ID WhatsApp Anda: <code>${from}</code>\n` +
+        (isAdmin ? '✅ Terdaftar sebagai *ADMIN*.' : '⚠️ *Bukan admin*. Tambahkan ID di atas ke Script Properties `ADMIN_ID` agar dikenali.'));
       return;
     }
 
-    // ADMIN: semua pesan lain dilayani asisten Gemini (awalan "bot "/"ask " boleh dipakai, tidak wajib)
+    if (text.startsWith('/link') || text.startsWith('#link')) { reply_(from, getPropSafe_('WEBAPP_URL')); return; }
+    if (text === '#ping' || text === 'ping') { reply_(from, '🏓 Pong! Bot aktif.'); return; }
+    if (text === '#menu' || text === 'menu') { sendMenu_(from); return; }
+
     if (isAdmin) {
-      let query = originalText;
-      if (text.startsWith('bot ') || text.startsWith('ask ')) query = originalText.substring(4).trim();
-      return handleGeminiAssistant_(from, query);
+      if (text === '1' || text === 'open') { replyOpenTickets_(from); return; }
+      if (text === '2' || text === 'pending') { replyPendingTickets_(from); return; }
+      if (text === '3' || text === 'rekap') { replyRekapHariIni_(from); return; }
+
+      const matchBalas = originalText.match(/^(?:#|SIPEKAT-)?(\d+)\s+([\s\S]+)/i);
+      if (matchBalas) {
+        handleBalasPengaduan_(from, matchBalas[1], matchBalas[2]);
+        return;
+      }
+
+      if (text.startsWith('ai ') || text.startsWith('gemini ')) {
+        handleGeminiAssistant_(from, originalText.replace(/^(ai|gemini)\s+/i, ''));
+        return;
+      }
+
+      // Default Admin: panggil Gemini Assistant
+      handleGeminiAssistant_(from, originalText);
+      return;
     }
 
-    // PELANGGAN UMUM: Customer Service AI
-    return handleGeminiCS_(from, originalText);
+    // Jalur Pelanggan Umum -> Gemini CS
+    handleGeminiCS_(from, originalText);
 
   } catch (err) {
-    LoggerService.error('WAHA Router ERROR', { error: err.message });
+    if (typeof LoggerService !== 'undefined') {
+      LoggerService.error('Error processWahaUpdate_', err);
+    }
   }
 }
 
