@@ -401,59 +401,70 @@ function jsonOutput_(obj) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+// ───────────────────────────────────────────────────────────────────────
+//  BAGIAN 1 — ROUTER WEBHOOK WAHA
+// ───────────────────────────────────────────────────────────────────────
 function processWahaUpdate_(update) {
-    try {
-      const payload = update.payload;
-      if (!payload || payload.fromMe === true || update.event !== 'message') return;
-  
-      const rawText = payload.body || payload.text || payload.message?.conversation || payload.message?.extendedTextMessage?.text || payload.message?.text || '';
-      const text = normalizeText_(rawText);
-      const originalText = rawText.trim();
-      const from = String(payload.from || '').trim();
-      
-      if (!text || from === getPropSafe_('WA_ID') || from === 'status@broadcast') return;
+  try {
+    const payload = update.payload;
+    if (!payload || payload.fromMe === true || update.event !== 'message') return;
 
-      // --- DAFTAR NOMOR ADMIN / OWNER ASISTEN ---
-      let cleanChatId = String(from).replace(/[^0-9]/g, '');
-      if (cleanChatId.startsWith('0')) cleanChatId = '62' + cleanChatId.substring(1);
-      
-      // Ambil nomor admin dari Script Properties atau fallback list
-      const registeredAdmins = (getPropSafe_('ADMIN_NUMBERS') || '126005884797153,6285731669222').split(',').map(s => s.trim());
-      const isAdmin = registeredAdmins.includes(cleanChatId);
-  
-      // 1. Tetap dukung command manual (#cek, #lapor, #tag, dll)
-      const regex = /^#?(lapor|cek|al(?:amat)?|pt|petugas|ll|lokasi|koordinat|tag|open|menu|halo|hi|help|start)(?:#|\s+)?(.*)/i;
-      const match = text.match(regex);
-  
-      if (match) {
-        const command = match[1].toLowerCase(), cleanPayload = match[2].trim();
-        if (['menu', 'halo', 'hi', 'help', 'start'].includes(command)) return sendMenu_(from);
-  
-        switch (command) {
-          case 'lapor': return handleLapor_(from, cleanPayload);
-          case 'cek':   return handleCek_(from, cleanPayload);
-          case 'tag':   return handleTag_(from, cleanPayload);
-          case 'open':  return handleOpen_(from, cleanPayload);
-          case 'al': case 'alamat': return handleInfo_(from, cleanPayload, 'al');
-          case 'pt': case 'petugas':return handleInfo_(from, cleanPayload, 'pt');
-          case 'll': case 'lokasi': case 'koordinat': return handleLokasiWA_(from, cleanPayload);
-        }
-        return;
+    const rawText = payload.body || payload.text || payload.message?.conversation || payload.message?.extendedTextMessage?.text || payload.message?.text || '';
+    const text = normalizeText_(rawText);
+    const originalText = rawText.trim();
+    const from = String(payload.from || '').trim();
+
+    if (!text || from === getPropSafe_('WA_ID') || from === 'status@broadcast') return;
+
+    // Webhook bisa dikirim ulang WAHA bila balasan GAS lambat -> jangan proses dua kali
+    if (isDuplicateWaMessage_(payload, update)) return;
+
+    const isAdmin = isAdminChat_(from);
+
+    // Cek identitas pengirim (membantu bila nomor Anda tidak dikenali sebagai admin)
+    if (text === '#id') {
+      return reply_(from, '🆔 ID WhatsApp Anda: <code>' + from + '</code>\n' + (isAdmin ? 'Status: <b>ADMIN</b> (asisten aktif)' : 'Status: <b>bukan admin</b> (dilayani sebagai pelanggan)'));
+    }
+
+    // Perintah manual. Perubahan dari versi lama:
+    //  - harus diikuti '#', spasi, atau akhir teks (jadi "hitung", "tagihan", "alat"
+    //    tidak lagi salah dikira perintah hi/tag/al)
+    //  - untuk ADMIN hanya perintah berawalan '#' (atau "menu"/"help") yang dianggap
+    //    perintah manual; kalimat bebas seperti "cek tiket open di KD" masuk ke Gemini
+    const regex = /^#?(lapor|cek|al(?:amat)?|pt|petugas|ll|lokasi|koordinat|tag|open|menu|halo|hi|help|start)(?:#|\s+|$)(.*)/i;
+    const match = text.match(regex);
+    const isExplicit = originalText.charAt(0) === '#';
+    const adminMenu = isAdmin && (text === 'menu' || text === 'help');
+
+    if (match && (!isAdmin || isExplicit || adminMenu)) {
+      const command = match[1].toLowerCase(), cleanPayload = match[2].trim();
+      if (['menu', 'halo', 'hi', 'help', 'start'].includes(command)) return sendMenu_(from);
+
+      switch (command) {
+        case 'lapor': return handleLapor_(from, cleanPayload);
+        case 'cek':   return handleCek_(from, cleanPayload);
+        case 'tag':   return handleTag_(from, cleanPayload);
+        case 'open':  return handleOpen_(from, cleanPayload);
+        case 'al': case 'alamat': return handleInfo_(from, cleanPayload, 'al');
+        case 'pt': case 'petugas': return handleInfo_(from, cleanPayload, 'pt');
+        case 'll': case 'lokasi': case 'koordinat': return handleLokasiWA_(from, cleanPayload);
       }
-  
-      // 2. JIKA CHAT DARI ADMIN: Selalu layani sebagai Asisten Pintar
-      if (isAdmin) {
-        // Menghapus prefix jika ada, atau gunakan langsung teks apa adanya
-        let query = originalText;
-        if (text.startsWith('bot ') || text.startsWith('ask ')) {
-          query = originalText.substring(4).trim();
-        }
-        return handleGeminiAssistant_(from, query);
-      }
-  
-      // 3. JIKA DARI PELANGGAN UMUM: Masuk ke Customer Service AI
-      return handleGeminiCS_(from, originalText);
-  } catch (err) { LoggerService.error('WAHA Router ERROR', { error: err.message }); }
+      return;
+    }
+
+    // ADMIN: semua pesan lain dilayani asisten Gemini (awalan "bot "/"ask " boleh dipakai, tidak wajib)
+    if (isAdmin) {
+      let query = originalText;
+      if (text.startsWith('bot ') || text.startsWith('ask ')) query = originalText.substring(4).trim();
+      return handleGeminiAssistant_(from, query);
+    }
+
+    // PELANGGAN UMUM: Customer Service AI
+    return handleGeminiCS_(from, originalText);
+
+  } catch (err) {
+    LoggerService.error('WAHA Router ERROR', { error: err.message });
+  }
 }
 
 const LaloService = {
@@ -1930,37 +1941,70 @@ function geminiOcrHandler_(payload) {
 // INTEGRASI GEMINI CS & ASISTEN
 // =======================================================================
 
-function callGeminiChat_(prompt, requireJson = false) {
+// ───────────────────────────────────────────────────────────────────────
+//  BAGIAN 2 — PANGGIL GEMINI (dengan retry & model cadangan)
+//  Model utama: Script Property GEMINI_MODEL (default 'gemini-flash-latest', sama dengan OCR).
+//  Bila Google sedang overload (429/500/503/504): coba ulang 3x, lalu pakai model cadangan
+//  GEMINI_MODEL_FALLBACK (default 'gemini-flash-lite-latest'). Kunci dikirim lewat header.
+// ───────────────────────────────────────────────────────────────────────
+function geminiPost_(model, apiKey, body, attempts) {
+  const url = 'https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent';
+  let res = { code: 0, raw: '' };
+  for (let i = 1; i <= attempts; i++) {
+    const r = UrlFetchApp.fetch(url, {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { 'x-goog-api-key': apiKey },
+      payload: JSON.stringify(body),
+      muteHttpExceptions: true
+    });
+    res = { code: r.getResponseCode(), raw: r.getContentText() };
+    if ([429, 500, 503, 504].indexOf(res.code) === -1) break;   // sukses atau error permanen
+    if (i < attempts) Utilities.sleep(1500 * i);                // jeda 1,5 dtk, 3 dtk, ...
+  }
+  return res;
+}
+
+function callGeminiChat_(prompt, requireJson = false, opts = {}) {
   const apiKey = getPropSafe_('GEMINI_API_KEY');
-  if (!apiKey) throw new Error("GEMINI_API_KEY belum diset.");
-  
-  const model = getPropSafe_('GEMINI_MODEL') || 'gemini-1.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  
-  let generationConfig = { temperature: 0.3 };
-  if (requireJson) {
-    generationConfig.responseMimeType = "application/json";
+  if (!apiKey) throw new Error('GEMINI_API_KEY belum diset (Project Settings > Script Properties).');
+
+  const primary = getPropSafe_('GEMINI_MODEL') || ASSISTANT_.DEFAULT_MODEL;
+  const fallback = getPropSafe_('GEMINI_MODEL_FALLBACK') || ASSISTANT_.FALLBACK_MODEL;
+
+  const generationConfig = { temperature: opts.temperature != null ? opts.temperature : 0.3 };
+  if (requireJson) generationConfig.responseMimeType = 'application/json';
+
+  const contents = (opts.history || []).map(h => ({
+    role: h.role === 'model' ? 'model' : 'user',
+    parts: [{ text: String(h.text || '') }]
+  }));
+  contents.push({ role: 'user', parts: [{ text: String(prompt) }] });
+
+  const body = { contents: contents, generationConfig: generationConfig };
+  if (opts.system) body.systemInstruction = { parts: [{ text: String(opts.system) }] };
+
+  let usedModel = primary;
+  let res = geminiPost_(primary, apiKey, body, 3);
+
+  const overloaded = c => [429, 500, 503, 504].indexOf(c) !== -1;
+  if (overloaded(res.code) && fallback && fallback !== primary) {
+    const res2 = geminiPost_(fallback, apiKey, body, 2);
+    if (res2.code === 200) { res = res2; usedModel = fallback; }
   }
 
-  const payload = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: generationConfig
-  };
+  if (res.code === 404) throw new Error('Model "' + usedModel + '" tidak tersedia. Hapus Script Property GEMINI_MODEL atau isi dengan model yang masih aktif.');
+  if (overloaded(res.code)) throw new Error('Gemini sedang sibuk atau kuota habis (HTTP ' + res.code + '). Coba lagi sebentar lagi.');
+  if (res.code !== 200) throw new Error('Gemini HTTP ' + res.code + ': ' + res.raw.substring(0, 300));
 
-  const options = {
-    method: 'post',
-    contentType: 'application/json',
-    payload: JSON.stringify(payload),
-    muteHttpExceptions: true
-  };
-
-  const response = UrlFetchApp.fetch(url, options);
-  if (response.getResponseCode() !== 200) {
-    throw new Error("Gagal menghubungi Gemini: " + response.getContentText());
+  const data = JSON.parse(res.raw);
+  const cand = data.candidates && data.candidates[0];
+  const parts = cand && cand.content && cand.content.parts;
+  if (!parts || !parts.length) {
+    throw new Error('Gemini tidak mengembalikan jawaban' + (cand && cand.finishReason ? ' (' + cand.finishReason + ')' : ''));
   }
-
-  const data = JSON.parse(response.getContentText());
-  return data.candidates[0].content.parts[0].text;
+  if (usedModel !== primary) LoggerService.warn('Gemini pakai model cadangan', { primary: primary, fallback: usedModel });
+  return parts.map(p => p.text || '').join('');
 }
 
 function handleGeminiCS_(chatId, text) {
@@ -2012,120 +2056,316 @@ Chat dari pelanggan: "${text}"
   }
 }
 
-function handleGeminiAssistant_(chatId, queryText) {
-  reply_(chatId, '⏳ _Memproses perintah..._');
-  
+// ───────────────────────────────────────────────────────────────────────
+//  BAGIAN 3 — ASISTEN ADMIN (baca data langsung, ubah data dengan konfirmasi)
+// ───────────────────────────────────────────────────────────────────────
+const ASSISTANT_ = {
+  DEFAULT_MODEL: 'gemini-flash-latest',
+  FALLBACK_MODEL: 'gemini-flash-lite-latest',
+  HISTORY_MAX: 8,      // jumlah pesan (user + asisten) yang diingat
+  HISTORY_TTL: 1800,   // detik (30 menit)
+  PENDING_TTL: 300,    // detik batas waktu balas YA/BATAL
+  LIST_MAX: 15,        // maksimal baris tiket per balasan
+  ACTIVE_MAX: 400      // maksimal tiket aktif yang dibacakan ke Gemini
+};
+
+function isAdminChat_(chatId) {
+  let id = String(chatId || '').replace(/[^0-9]/g, '');
+  if (id.startsWith('0')) id = '62' + id.substring(1);
+  const list = (getPropSafe_('ADMIN_NUMBERS') || '126005884797153,6285731669222')
+    .split(',').map(s => s.replace(/[^0-9]/g, '')).filter(Boolean);
+  return list.indexOf(id) !== -1;
+}
+
+function isDuplicateWaMessage_(payload, update) {
+  const id = String((payload && payload.id) || (update && update.id) || '').trim();
+  if (!id) return false;
+  const key = 'wa_dup_' + id.substring(0, 200);
+  const cache = CacheService.getScriptCache();
+  if (cache.get(key)) return true;
+  cache.put(key, '1', 600);
+  return false;
+}
+
+// ── state kecil per admin (riwayat obrolan & perubahan yang menunggu konfirmasi) ──
+function assistantKey_(prefix, chatId) { return prefix + String(chatId).replace(/[^0-9]/g, ''); }
+
+function assistantGetPending_(chatId) {
+  const s = CacheService.getScriptCache().get(assistantKey_('asst_pend_', chatId));
+  try { return s ? JSON.parse(s) : null; } catch (e) { return null; }
+}
+function assistantSetPending_(chatId, p) {
+  CacheService.getScriptCache().put(assistantKey_('asst_pend_', chatId), JSON.stringify(p), ASSISTANT_.PENDING_TTL);
+}
+function assistantClearPending_(chatId) {
+  CacheService.getScriptCache().remove(assistantKey_('asst_pend_', chatId));
+}
+function assistantGetHistory_(chatId) {
+  const s = CacheService.getScriptCache().get(assistantKey_('asst_hist_', chatId));
+  try { return s ? JSON.parse(s) : []; } catch (e) { return []; }
+}
+function assistantPushHistory_(chatId, userText, replyText) {
+  const h = assistantGetHistory_(chatId);
+  h.push({ role: 'user', text: String(userText).substring(0, 500) });
+  h.push({ role: 'model', text: String(replyText || '').substring(0, 800) });
+  CacheService.getScriptCache().put(
+    assistantKey_('asst_hist_', chatId),
+    JSON.stringify(h.slice(-ASSISTANT_.HISTORY_MAX)),
+    ASSISTANT_.HISTORY_TTL
+  );
+}
+
+// ── ringkasan akurat dari sheet (dihitung kode, bukan ditebak model) ──
+// Daftar tiket aktif sengaja TANPA nama, alamat, dan telepon pelanggan (data pribadi tidak
+// dikirim ke Gemini kecuali lewat pencarian kata kunci yang dijalankan di sisi kode).
+function assistantSnapshot_() {
+  const snap = { totalTiket: 0, perStatus: {}, aktifPerArea: {}, lines: [], hidden: 0 };
+  const sh = getSheet(), lr = sh.getLastRow();
+  if (lr < 2) return snap;
+  const vals = sh.getRange(2, COL.TICKET, lr - 1, COL.PETUGAS - COL.TICKET + 1).getValues();
+  vals.forEach(r => {
+    const ticket = String(r[0]).trim().toUpperCase();
+    if (!ticket) return;
+    const status = String(r[COL.STATUS - COL.TICKET]).trim().toUpperCase() || '-';
+    snap.totalTiket++;
+    snap.perStatus[status] = (snap.perStatus[status] || 0) + 1;
+    if (status !== STATUS.SELESAI) {
+      const m = ticket.match(/^PGD-([A-Z0-9]+)-/);
+      const area = m ? m[1] : '??';
+      snap.aktifPerArea[area] = (snap.aktifPerArea[area] || 0) + 1;
+      const keluhan = String(r[COL.PENGADUAN - COL.TICKET]).trim().toUpperCase().replace(/\s+/g, ' ').substring(0, 60);
+      const petugas = String(r[COL.PETUGAS - COL.TICKET]).trim().toUpperCase();
+      snap.lines.push(ticket + '|' + status + '|' + keluhan + '|' + petugas);
+    }
+  });
+  if (snap.lines.length > ASSISTANT_.ACTIVE_MAX) {
+    snap.hidden = snap.lines.length - ASSISTANT_.ACTIVE_MAX;
+    snap.lines = snap.lines.slice(-ASSISTANT_.ACTIVE_MAX);   // yang terbaru
+  }
+  return snap;
+}
+
+function assistantSystemPrompt_(snap) {
+  const now = Utilities.formatDate(new Date(), CONFIG.TZ, 'dd MMM yyyy HH:mm');
+  const ringkas = { totalTiket: snap.totalTiket, perStatus: snap.perStatus, aktifPerArea: snap.aktifPerArea };
+  return [
+    'Anda rekan kerja admin JarGas Sidoarjo yang membantu lewat WhatsApp.',
+    'Gaya bicara: ramah dan santai seperti chat WhatsApp sehari-hari (bahasa Indonesia), singkat, langsung ke inti, tanpa pembuka kaku. Boleh satu emoji seperlunya. Jangan menyebut JSON, aksi, sistem, atau bahwa Anda AI.',
+    'Jangan mengarang data. Jika tidak tahu atau datanya tidak ada, bilang apa adanya.',
+    '',
+    'Waktu sekarang: ' + now,
+    'Ringkasan sheet REPORT (akurat, dihitung dari data): ' + JSON.stringify(ringkas),
+    'Kode area ada di nomor tiket (PGD-<AREA>-yymmdd-urut): KD = Kedung Banteng, WR = Waru. Status: OPEN, PROSES, SELESAI.',
+    '',
+    'Tiket aktif (OPEN/PROSES), format TIKET|STATUS|KELUHAN|PETUGAS' + (snap.hidden ? ' (' + snap.hidden + ' tiket lama tidak ditampilkan)' : '') + ':',
+    snap.lines.join('\n') || '(tidak ada)',
+    '',
+    'Balas HANYA dengan satu objek JSON (tanpa markdown, tanpa teks lain) berbentuk:',
+    '{"action":"","ticket":"","idpel":"","status":"","petugas":"","tindakan":"","filter":{"status":"","area":"","petugas":"","keywords":[]},"replyText":""}',
+    '',
+    'Pilihan action:',
+    '- "general_reply": obrolan, pertanyaan, penilaian, atau ringkasan. Jawab dari data di atas lewat replyText. Hitung dengan teliti; bila jumlah penting atau daftar terpotong, pakai list_tickets.',
+    '- "list_tickets": admin minta daftar atau jumlah tiket. Isi filter (kosongkan yang tidak disebut). keywords = daftar kata kunci, tiket cocok bila SALAH SATU ada di nama/alamat/keluhan; pakai variasi tulisan yang terlihat di data (mis. MGRT dan METER). replyText = satu kalimat pengantar santai TANPA angka (jumlah pasti ditambahkan otomatis).',
+    '- "search_ticket": detail satu tiket. Isi ticket.',
+    '- "search_customer": data pelanggan. Isi idpel.',
+    '- "update_status": admin MEMERINTAHKAN mengubah tiket (selesaikan/proses/ubah status, isi petugas atau keterangan). Isi ticket, lalu status/petugas/tindakan yang disebut saja.',
+    'Jika nomor tiket tidak disebut, ambil dari riwayat percakapan; jika tetap tidak jelas pakai general_reply dan tanyakan nomor tiketnya.'
+  ].join('\n');
+}
+
+// Indikator "sedang mengetik" di WhatsApp admin (best-effort; gagal pun tidak masalah)
+function wahaTyping_(chatId) {
   try {
-    // 1. Ambil ringkasan status terkini spreadsheet sebagai konteks
-    const shReport = getSheet();
-    const lr = shReport.getLastRow();
-    let openCount = 0;
-    let sampleTickets = [];
-    
-    if (lr > 1) {
-      const reportValues = shReport.getRange(Math.max(2, lr - 30), 1, Math.min(30, lr - 1), 10).getValues();
-      reportValues.forEach(r => {
-        const st = String(r[COL.STATUS - 1]).toUpperCase();
-        if (st === 'OPEN' || st === 'PROSES') {
-          openCount++;
-          sampleTickets.push(`${r[COL.TICKET - 1]} (${r[COL.NAMA - 1]} - ${r[COL.PENGADUAN - 1]} - ${st})`);
-        }
-      });
+    UrlFetchApp.fetch(getPropSafe_('WAHA_URL').replace(/\/$/, '') + '/api/startTyping', {
+      method: 'post',
+      contentType: 'application/json',
+      headers: { 'X-Api-Key': getPropSafe_('WAHA_API_KEY') },
+      payload: JSON.stringify({ chatId: chatId, session: getPropSafe_('WAHA_SESSION') || 'default' }),
+      muteHttpExceptions: true
+    });
+  } catch (e) {}
+}
+
+function assistantParse_(raw) {
+  const s = String(raw || '').trim().replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '');
+  try {
+    const o = JSON.parse(s);
+    if (o && typeof o === 'object') return o;
+  } catch (e) {}
+  return { action: 'general_reply', replyText: String(raw || '').trim() };
+}
+
+// ── titik masuk dari router ──
+function handleGeminiAssistant_(chatId, queryText) {
+  try {
+    if (!isAdminChat_(chatId)) return reply_(chatId, '❌ Asisten ini hanya untuk admin.');
+    const q = String(queryText || '').trim();
+    if (!q) return reply_(chatId, '💬 Silakan ketik pertanyaan atau perintah Anda.');
+
+    // A. Jawaban untuk perubahan data yang sedang menunggu konfirmasi
+    const pending = assistantGetPending_(chatId);
+    if (pending) {
+      const ans = normalizeText_(q);
+      assistantClearPending_(chatId);
+      if (/^(ya|y|ok|oke|lanjut|setuju|simpan)$/.test(ans)) return assistantApplyUpdate_(chatId, pending);
+      if (/^(tidak|tdk|ga|gak|batal|cancel|no|n)$/.test(ans)) return reply_(chatId, '🚫 Dibatalkan. Tidak ada data yang diubah.');
+      // selain itu = perintah baru; perubahan lama otomatis batal
     }
 
-    const systemPrompt = `
-Anda adalah Asisten Operasional Cerdas untuk sistem JarGas Sidoarjo yang mengelola Google Sheets "Base_Project" dan google workspace lainnya.
-Anda berinteraksi langsung dengan ADMIN / OWNER melalui WhatsApp.
-
-Konteks Spreadsheet saat ini:
-- Sheet Utama: REPORT (Pengaduan), dbase (Master Pelanggan & Stand Meter).
-- Tiket Open/Proses baru-baru ini: ${sampleTickets.slice(0, 10).join('; ') || 'Tidak ada'}
-
-Instruksi Anda:
-1. Jika admin hanya bertanya biasa atau meminta ringkasan, jawablah secara ringkas, jelas, dan profesional dalam bahasa Indonesia.
-2. Jika admin MEMERINTAHKAN perubahan data (misal: selesaikan tiket, ubah status, catat laporan, atau cari data):
-   Keluarkan respon JSON VALID HANYA dengan format berikut (tanpa markdown atau teks pembuka):
-   {
-     "action": "update_status" | "search_ticket" | "search_customer" | "general_reply",
-     "ticket": "NOMOR_TIKET",
-     "status": "OPEN" | "PROSES" | "SELESAI",
-     "petugas": "NAMA_PETUGAS",
-     "tindakan": "KETERANGAN_TINDAKAN",
-     "idpel": "NOMOR_IDPEL",
-     "replyText": "Pesan konfirmasi ramah yang akan dikirim ke admin"
-   }
-
-Perintah dari Admin: "${queryText}"
-    `;
-
-    const rawResponse = callGeminiChat_(systemPrompt, false).trim();
-    
-    // Cek apakah Gemini mengeluarkan instruksi JSON untuk eksekusi
-    let parsed = null;
-    try {
-      if (rawResponse.startsWith('{') && rawResponse.endsWith('}')) {
-        parsed = JSON.parse(rawResponse);
-      }
-    } catch(e) {}
-
-    if (parsed && parsed.action) {
-      // Eksekusi Update Status Tiket
-      if (parsed.action === 'update_status' && parsed.ticket) {
-        const row = TicketService.findRow(shReport, parsed.ticket);
-        if (row !== -1) {
-          if (parsed.status) shReport.getRange(row, COL.STATUS).setValue(parsed.status.toUpperCase());
-          if (parsed.petugas) shReport.getRange(row, COL.PETUGAS).setValue(parsed.petugas.toUpperCase());
-          if (parsed.tindakan) shReport.getRange(row, COL.KETERANGAN).setValue(parsed.tindakan.toUpperCase());
-          SpreadsheetApp.flush();
-          clearCache_();
-          return reply_(chatId, `✅ *TIKET DIPERBARUI*\nTiket: *${parsed.ticket}*\nStatus: *${parsed.status || '-'}*\nPetugas: *${parsed.petugas || '-'}*\nKeterangan: *${parsed.tindakan || '-'}*`);
-        } else {
-          return reply_(chatId, `❌ Tiket *${parsed.ticket}* tidak ditemukan di sheet REPORT.`);
-        }
-      }
-
-      // Eksekusi Pencarian Tiket
-      if (parsed.action === 'search_ticket' && parsed.ticket) {
-        return handleCek_(chatId, parsed.ticket);
-      }
-
-      // Eksekusi Pencarian Data Pelanggan
-      if (parsed.action === 'search_customer' && parsed.idpel) {
-        const cust = DapellService.getById(parsed.idpel);
-        if (cust) {
-          return reply_(chatId, `🆔 *DATA PELANGGAN*\nID: \`${parsed.idpel}\`\nNama: ${cust.nama}\nAlamat: ${cust.alamat}\nPetugas: ${cust.petugas}`);
-        } else {
-          return reply_(chatId, `❌ ID Pelanggan \`${parsed.idpel}\` tidak ditemukan.`);
-        }
-      }
-
-      if (parsed.replyText) {
-        return reply_(chatId, parsed.replyText);
-      }
-    }
-
-    // Jawaban teks langsung jika tidak ada aksi database
-    return reply_(chatId, rawResponse);
+    // B. Tanya Gemini
+    wahaTyping_(chatId);
+    const raw = callGeminiChat_(q, true, {
+      system: assistantSystemPrompt_(assistantSnapshot_()),
+      history: assistantGetHistory_(chatId),
+      temperature: 0.2
+    });
+    const sent = assistantRun_(chatId, assistantParse_(raw));
+    assistantPushHistory_(chatId, q, sent);
 
   } catch (err) {
     LoggerService.error('handleGeminiAssistant_ Error', { error: err.message });
     return reply_(chatId, '❌ _Terjadi kendala saat memproses perintah:_ ' + err.message);
-
+  }
 }
 
+// ── eksekusi hasil keputusan Gemini; mengembalikan teks ringkas untuk riwayat ──
+function assistantRun_(chatId, c) {
+  const action = String(c.action || 'general_reply').trim().toLowerCase();
+  const ticket = String(c.ticket || '').replace(/[^0-9a-zA-Z\-]/g, '').toUpperCase();
 
-function simpanPengaturanAwal() {
-  const props = PropertiesService.getScriptProperties();
-  
-  // 1. Simpan Gemini API Key
-  props.setProperty('GEMINI_API_KEY', 'AQ.Ab8RN6JMIjhknQLKJE0TyWcCSBARz27AOLtKFIIfjHJYE5jkdg');
-  
-  // Model default Gemini
-  props.setProperty('GEMINI_MODEL', 'gemini-1.5-flash');
+  switch (action) {
+    case 'search_ticket':
+      if (!ticket) break;
+      handleCek_(chatId, ticket);
+      return '(menampilkan detail tiket ' + ticket + ')';
 
-  // 2. Daftarkan nomor WhatsApp Anda (format: 628xxxxxx, pisahkan dengan koma jika lebih dari satu)
-  props.setProperty('ADMIN_NUMBERS', '6285731669222,126005884797153');
-  
-  Logger.log('✅ Pengaturan GEMINI_API_KEY dan ADMIN_NUMBERS berhasil disimpan!');
+    case 'search_customer': {
+      const idpel = String(c.idpel || '').replace(/[^0-9a-zA-Z]/g, '').toUpperCase();
+      if (!idpel) break;
+      const cust = DapellService.getById(idpel);
+      const msg = cust
+        ? '🆔 <b>DATA PELANGGAN</b>\nID: <code>' + idpel + '</code>\nNama: ' + escHtml_(cust.nama) + '\nAlamat: ' + escHtml_(cust.alamat) + '\nPetugas: ' + escHtml_(cust.petugas || '-')
+        : '❌ ID Pelanggan <code>' + idpel + '</code> tidak ditemukan.';
+      reply_(chatId, msg);
+      return msg;
+    }
+
+    case 'list_tickets':
+      return assistantListTickets_(chatId, c.filter || {}, c.replyText);
+
+    case 'update_status':
+      return assistantAskConfirm_(chatId, c, ticket);
+  }
+
+  const text = String(c.replyText || '').trim() || 'Maaf, saya belum mengerti perintahnya. Coba ulangi dengan kalimat lain.';
+  reply_(chatId, escHtml_(text));
+  return text;
 }
 
+function assistantListTickets_(chatId, f, lead) {
+  f = f || {};
+  const status = String(f.status || '').trim().toUpperCase();
+  const area = String(f.area || '').trim().toUpperCase();
+  const petugas = String(f.petugas || '').trim().toUpperCase();
+  let kws = Array.isArray(f.keywords) ? f.keywords.slice() : [];
+  if (f.keyword) kws.push(f.keyword);
+  kws = kws.map(k => String(k).trim().toUpperCase()).filter(Boolean);
+
+  const data = getSheet().getDataRange().getValues();
+  const rows = [];
+  for (let i = 1; i < data.length; i++) {
+    const r = data[i];
+    const ticket = String(r[COL.TICKET - 1]).trim().toUpperCase();
+    if (!ticket) continue;
+    const st = String(r[COL.STATUS - 1]).trim().toUpperCase();
+    if (status && st !== status) continue;
+    if (area && ticket.indexOf('-' + area + '-') === -1) continue;
+    const ptg = String(r[COL.PETUGAS - 1]).trim().toUpperCase();
+    if (petugas && ptg.indexOf(petugas) === -1) continue;
+    const nama = String(r[COL.NAMA - 1]).trim().toUpperCase();
+    const alamat = String(r[COL.ALAMAT - 1]).trim().toUpperCase();
+    const keluhan = String(r[COL.PENGADUAN - 1]).trim().toUpperCase();
+    if (kws.length) {
+      const hay = nama + ' ' + alamat + ' ' + keluhan;
+      if (!kws.some(k => hay.indexOf(k) !== -1)) continue;
+    }
+    rows.push({ ticket: ticket, st: st, nama: nama, keluhan: keluhan, ptg: ptg });
+  }
+
+  const label = [status && 'status ' + status, area && 'area ' + area, petugas && 'petugas ' + petugas, kws.length && 'kata ' + kws.join('/')]
+    .filter(Boolean).join(', ') || 'semua tiket';
+
+  if (rows.length === 0) {
+    const none = '🔎 Tidak ada tiket yang cocok (' + escHtml_(label) + ').';
+    reply_(chatId, none);
+    return none;
+  }
+
+  const intro = String(lead || '').trim();
+  let msg = (intro ? escHtml_(intro) + '\n\n' : '') + '📊 <b>Total: ' + rows.length + ' tiket</b> <i>(' + escHtml_(label) + ')</i>';
+
+  const shown = rows.slice(-ASSISTANT_.LIST_MAX).reverse(); // terbaru dulu
+  shown.forEach((x, i) => {
+    msg += '\n\n' + (i + 1) + '. <b>' + x.ticket + '</b> (' + x.st + ')\n👤 ' + escHtml_(x.nama) + '\n📄 ' + escHtml_(x.keluhan) + (x.ptg ? '\n👷 ' + escHtml_(x.ptg) : '');
+  });
+  if (rows.length > shown.length) msg += '\n\n<i>... dan ' + (rows.length - shown.length) + ' tiket lain (' + shown.length + ' terbaru ditampilkan).</i>';
+  if (msg.length > 3800) msg = msg.substring(0, msg.lastIndexOf('\n', 3800)) + '\n<i>... dipotong.</i>';
+
+  reply_(chatId, msg);
+  return (intro ? intro + ' ' : '') + '[' + rows.length + ' tiket, ' + label + ']';
+}
+
+// ── ubah data: minta konfirmasi dulu, simpan setelah admin balas YA ──
+function assistantAskConfirm_(chatId, c, ticket) {
+  const status = String(c.status || '').trim().toUpperCase();
+  const petugas = String(c.petugas || '').trim();
+  const tindakan = String(c.tindakan || '').trim();
+  const say = m => { reply_(chatId, m); return m; };
+
+  if (!ticket) return say('❌ Nomor tiket tidak terbaca. Sebutkan nomor tiketnya, contoh: PGD-KD-260101-001.');
+  if (status && [STATUS.OPEN, STATUS.PROSES, STATUS.SELESAI].indexOf(status) === -1) {
+    return say('❌ Status harus OPEN, PROSES, atau SELESAI.');
+  }
+  if (!status && !petugas && !tindakan) return say('❌ Apa yang mau diubah di tiket ' + ticket + '? (status, petugas, atau keterangan)');
+
+  const sh = getSheet(), row = TicketService.findRow(sh, ticket);
+  if (row === -1) return say('❌ Tiket <b>' + ticket + '</b> tidak ditemukan di sheet REPORT.');
+
+  const cur = sh.getRange(row, 1, 1, 20).getValues()[0];
+  const curStatus = String(cur[COL.STATUS - 1]).trim().toUpperCase() || '-';
+  const nama = String(cur[COL.NAMA - 1]).trim().toUpperCase();
+
+  let msg = '📝 <b>KONFIRMASI PERUBAHAN</b>\nTiket: <b>' + ticket + '</b> (' + escHtml_(nama) + ')\nStatus: ' + curStatus + (status ? ' → <b>' + status + '</b>' : ' (tetap)');
+  if (petugas) msg += '\nPetugas: <b>' + escHtml_(petugas.toUpperCase()) + '</b>';
+  if (tindakan) msg += '\nKeterangan: <b>' + escHtml_(tindakan.toUpperCase()) + '</b>';
+  if (curStatus === STATUS.SELESAI) msg += '\n\n⚠️ <i>Tiket ini sudah berstatus SELESAI.</i>';
+  if (status === STATUS.SELESAI) {
+    const fotoSeb = String(cur[COL.FOTO_SEBELUM - 1]).trim(), fotoSes = String(cur[COL.FOTO_SESUDAH - 1]).trim();
+    if (!fotoSeb || !fotoSes) msg += '\n\n⚠️ <i>Foto sebelum/sesudah belum ada. Lewat WhatsApp foto tidak diunggah dan notifikasi selesai tidak dikirim.</i>';
+  }
+  msg += '\n\nBalas <b>YA</b> untuk menyimpan, atau <b>BATAL</b>.';
+
+  assistantSetPending_(chatId, { ticket: ticket, status: status, petugas: petugas, tindakan: tindakan });
+  return say(msg);
+}
+
+function assistantApplyUpdate_(chatId, p) {
+  const sh = getSheet(), row = TicketService.findRow(sh, p.ticket);
+  if (row === -1) { const m = '❌ Tiket <b>' + p.ticket + '</b> tidak ditemukan.'; reply_(chatId, m); return m; }
+
+  if (p.status) sh.getRange(row, COL.STATUS).setValue(Validation.sanitize(p.status));
+  if (p.petugas) sh.getRange(row, COL.PETUGAS).setValue(Validation.sanitize(p.petugas));
+  if (p.tindakan) sh.getRange(row, COL.KETERANGAN).setValue(Validation.sanitize(p.tindakan));
+  SpreadsheetApp.flush();
+  clearCache_();
+  LoggerService.info('ASSISTANT update_status', { admin: chatId, ticket: p.ticket, status: p.status, petugas: p.petugas, tindakan: p.tindakan });
+
+  const m = '✅ <b>TIKET DIPERBARUI</b>\nTiket: <b>' + p.ticket + '</b>\nStatus: <b>' + (p.status || '(tetap)') + '</b>\nPetugas: <b>' + escHtml_((p.petugas || '-').toUpperCase()) + '</b>\nKeterangan: <b>' + escHtml_((p.tindakan || '-').toUpperCase()) + '</b>';
+  reply_(chatId, m);
+  return m;
+}
+
+// ── uji dari editor Apps Script: cek kunci & model Gemini tanpa lewat WhatsApp ──
+function ujiGemini() {
+  Logger.log(callGeminiChat_('Balas satu kata saja: siap', false));
+}
