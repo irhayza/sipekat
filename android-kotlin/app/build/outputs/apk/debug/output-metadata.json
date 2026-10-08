@@ -4,14 +4,14 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.sipekat.app",
+  "applicationId": "com.jargas.si_pekat",
   "variantName": "debug",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 9,
+      "versionCode": 30002,
       "versionName": "3.0.2",
       "outputFile": "app-debug.apk"
     }

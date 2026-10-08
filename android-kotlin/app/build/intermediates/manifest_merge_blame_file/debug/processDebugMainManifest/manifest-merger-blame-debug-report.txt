@@ -1,7 +1,7 @@
 1<?xml version="1.0" encoding="utf-8"?>
 2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-3    package="com.sipekat.app"
-4    android:versionCode="9"
+3    package="com.jargas.si_pekat"
+4    android:versionCode="30002"
 5    android:versionName="3.0.2" >
 6
 7    <uses-sdk
@@ -9,352 +9,242 @@
 9        android:targetSdkVersion="35" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:5:5-67
-11-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:5:22-64
-12    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-12-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:6:5-79
-12-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:6:22-76
-13    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-13-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:7:5-81
-13-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:7:22-78
-14    <uses-permission android:name="android.permission.CAMERA" />
-14-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:8:5-65
-14-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:8:22-62
-15    <uses-permission
-15-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:9:5-10:38
-16        android:name="android.permission.READ_EXTERNAL_STORAGE"
-16-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:9:22-77
-17        android:maxSdkVersion="32" />
-17-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:10:9-35
-18    <uses-permission
-18-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:11:5-12:38
-19        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-19-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:11:22-78
-20        android:maxSdkVersion="28" />
-20-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:12:9-35
-21    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-21-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:13:5-76
-21-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:13:22-73
-22    <uses-permission android:name="android.permission.CALL_PHONE" />
-22-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:14:5-69
-22-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:14:22-66
-23
-24    <uses-feature
-24-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:15:5-85
-25        android:name="android.hardware.camera"
-25-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:15:19-57
-26        android:required="false" />
-26-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:15:58-82
-27
-28    <permission
-28-->[androidx.core:core:1.13.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\b92215334907df778e86cf1c1f6c1384\transformed\core-1.13.1\AndroidManifest.xml:22:5-24:47
-29        android:name="com.sipekat.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
-29-->[androidx.core:core:1.13.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\b92215334907df778e86cf1c1f6c1384\transformed\core-1.13.1\AndroidManifest.xml:23:9-81
-30        android:protectionLevel="signature" />
-30-->[androidx.core:core:1.13.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\b92215334907df778e86cf1c1f6c1384\transformed\core-1.13.1\AndroidManifest.xml:24:9-44
-31
-32    <uses-permission android:name="com.sipekat.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" /> <!-- Although the *SdkVersion is captured in gradle build files, this is required for non gradle builds -->
-32-->[androidx.core:core:1.13.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\b92215334907df778e86cf1c1f6c1384\transformed\core-1.13.1\AndroidManifest.xml:26:5-97
-32-->[androidx.core:core:1.13.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\b92215334907df778e86cf1c1f6c1384\transformed\core-1.13.1\AndroidManifest.xml:26:22-94
-33    <!-- <uses-sdk android:minSdkVersion="14"/> -->
-34    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-34-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:25:5-79
-34-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:25:22-76
-35
-36    <application
-36-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:17:5-76:19
-37        android:name="com.sipekat.app.SiPekatApp"
-37-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:18:9-35
-38        android:allowBackup="true"
-38-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:19:9-35
-39        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
-39-->[androidx.core:core:1.13.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\b92215334907df778e86cf1c1f6c1384\transformed\core-1.13.1\AndroidManifest.xml:28:18-86
-40        android:debuggable="true"
-41        android:extractNativeLibs="false"
-42        android:label="@string/app_name"
-42-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:20:9-41
-43        android:supportsRtl="true"
-43-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:21:9-35
-44        android:theme="@style/Theme.SiPEKAT"
-44-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:22:9-45
-45        android:usesCleartextTraffic="true" >
-45-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:23:9-44
-46        <activity
-46-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:26:9-34:20
-47            android:name="com.sipekat.app.ui.login.LoginActivity"
-47-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:27:13-51
-48            android:exported="true"
-48-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:28:13-36
-49            android:windowSoftInputMode="adjustResize" >
-49-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:29:13-55
-50            <intent-filter>
-50-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:30:13-33:29
-51                <action android:name="android.intent.action.MAIN" />
-51-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:31:17-69
-51-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:31:25-66
-52
-53                <category android:name="android.intent.category.LAUNCHER" />
-53-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:32:17-77
-53-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:32:27-74
-54            </intent-filter>
-55        </activity>
-56        <activity
-56-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:36:9-39:58
-57            android:name="com.sipekat.app.ui.main.MainActivity"
-57-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:37:13-49
-58            android:exported="false"
-58-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:38:13-37
-59            android:windowSoftInputMode="adjustResize" />
-59-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:39:13-55
-60        <activity
-60-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:41:9-45:66
-61            android:name="com.sipekat.app.ui.perbaikan.PerbaikanActivity"
-61-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:42:13-59
-62            android:exported="false"
-62-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:43:13-37
-63            android:parentActivityName="com.sipekat.app.ui.main.MainActivity"
-63-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:45:13-63
-64            android:windowSoftInputMode="adjustResize" />
-64-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:44:13-55
-65        <activity
-65-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:47:9-51:66
-66            android:name="com.sipekat.app.ui.pengaduan.PengaduanActivity"
-66-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:48:13-59
-67            android:exported="false"
-67-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:49:13-37
-68            android:parentActivityName="com.sipekat.app.ui.main.MainActivity"
-68-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:51:13-63
-69            android:windowSoftInputMode="adjustResize" />
-69-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:50:13-55
-70        <activity
-70-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:53:9-56:66
-71            android:name="com.sipekat.app.ui.ocr.OcrHomeActivity"
-71-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:54:13-51
+11-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:4:5-67
+11-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:4:22-64
+12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+12-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:5:5-79
+12-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:5:22-76
+13    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+13-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:6:5-79
+13-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:6:22-76
+14    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+14-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:7:5-81
+14-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:7:22-78
+15
+16    <permission
+16-->[androidx.core:core:1.15.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\2e16bd419386b71c5ba2282baeb2c290\transformed\core-1.15.0\AndroidManifest.xml:22:5-24:47
+17        android:name="com.jargas.si_pekat.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+17-->[androidx.core:core:1.15.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\2e16bd419386b71c5ba2282baeb2c290\transformed\core-1.15.0\AndroidManifest.xml:23:9-81
+18        android:protectionLevel="signature" />
+18-->[androidx.core:core:1.15.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\2e16bd419386b71c5ba2282baeb2c290\transformed\core-1.15.0\AndroidManifest.xml:24:9-44
+19
+20    <uses-permission android:name="com.jargas.si_pekat.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+20-->[androidx.core:core:1.15.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\2e16bd419386b71c5ba2282baeb2c290\transformed\core-1.15.0\AndroidManifest.xml:26:5-97
+20-->[androidx.core:core:1.15.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\2e16bd419386b71c5ba2282baeb2c290\transformed\core-1.15.0\AndroidManifest.xml:26:22-94
+21
+22    <application
+22-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:9:5-35:19
+23        android:name="com.jargas.si_pekat.SipekatApp"
+23-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:10:9-35
+24        android:allowBackup="false"
+24-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:11:9-36
+25        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+25-->[androidx.core:core:1.15.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\2e16bd419386b71c5ba2282baeb2c290\transformed\core-1.15.0\AndroidManifest.xml:28:18-86
+26        android:debuggable="true"
+27        android:extractNativeLibs="false"
+28        android:icon="@mipmap/launcher_icon"
+28-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:12:9-45
+29        android:label="SiPEKAT"
+29-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:13:9-32
+30        android:theme="@style/Theme.SiPEKAT" >
+30-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:14:9-45
+31        <activity
+31-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:15:9-25:20
+32            android:name="com.jargas.si_pekat.MainActivity"
+32-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:16:13-41
+33            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard|uiMode|fontScale|locale|layoutDirection"
+33-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:19:13-155
+34            android:exported="true"
+34-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:17:13-36
+35            android:screenOrientation="portrait"
+35-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:18:13-49
+36            android:windowSoftInputMode="adjustResize" >
+36-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:20:13-55
+37            <intent-filter>
+37-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:21:13-24:29
+38                <action android:name="android.intent.action.MAIN" />
+38-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:22:17-69
+38-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:22:25-66
+39
+40                <category android:name="android.intent.category.LAUNCHER" />
+40-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:23:17-77
+40-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:23:27-74
+41            </intent-filter>
+42        </activity>
+43
+44        <provider
+45            android:name="androidx.core.content.FileProvider"
+45-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:27:13-62
+46            android:authorities="com.jargas.si_pekat.fileprovider"
+46-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:28:13-64
+47            android:exported="false"
+47-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:29:13-37
+48            android:grantUriPermissions="true" >
+48-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:30:13-47
+49            <meta-data
+49-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:31:13-33:54
+50                android:name="android.support.FILE_PROVIDER_PATHS"
+50-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:32:17-67
+51                android:resource="@xml/file_paths" />
+51-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:33:17-51
+52        </provider>
+53
+54        <service
+54-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\cf32499814856874dd192193ef0bd92f\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:9:9-15:19
+55            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
+55-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\cf32499814856874dd192193ef0bd92f\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:10:13-91
+56            android:directBootAware="true"
+56-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:17:13-43
+57            android:exported="false" >
+57-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\cf32499814856874dd192193ef0bd92f\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:11:13-37
+58            <meta-data
+58-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\cf32499814856874dd192193ef0bd92f\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:12:13-14:85
+59                android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar"
+59-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\cf32499814856874dd192193ef0bd92f\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:13:17-114
+60                android:value="com.google.firebase.components.ComponentRegistrar" />
+60-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\cf32499814856874dd192193ef0bd92f\transformed\play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:14:17-82
+61            <meta-data
+61-->[com.google.mlkit:vision-common:17.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\9f880e26df807092c3e7f2bb22758a1d\transformed\vision-common-17.3.0\AndroidManifest.xml:12:13-14:85
+62                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
+62-->[com.google.mlkit:vision-common:17.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\9f880e26df807092c3e7f2bb22758a1d\transformed\vision-common-17.3.0\AndroidManifest.xml:13:17-124
+63                android:value="com.google.firebase.components.ComponentRegistrar" />
+63-->[com.google.mlkit:vision-common:17.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\9f880e26df807092c3e7f2bb22758a1d\transformed\vision-common-17.3.0\AndroidManifest.xml:14:17-82
+64            <meta-data
+64-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:20:13-22:85
+65                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
+65-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:21:17-120
+66                android:value="com.google.firebase.components.ComponentRegistrar" />
+66-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:22:17-82
+67        </service>
+68
+69        <provider
+69-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:9:9-13:38
+70            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
+70-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:10:13-78
+71            android:authorities="com.jargas.si_pekat.mlkitinitprovider"
+71-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:11:13-69
 72            android:exported="false"
-72-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:55:13-37
-73            android:parentActivityName="com.sipekat.app.ui.main.MainActivity" />
-73-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:56:13-63
-74        <activity
-74-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:58:9-62:68
-75            android:name="com.sipekat.app.ui.ocr.MeterReadingActivity"
-75-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:59:13-56
-76            android:exported="false"
-76-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:60:13-37
-77            android:parentActivityName="com.sipekat.app.ui.ocr.OcrHomeActivity"
-77-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:62:13-65
-78            android:windowSoftInputMode="adjustResize" />
-78-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:61:13-55
+72-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:12:13-37
+73            android:initOrder="99" />
+73-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\ad312b04b7ceec246f8b9a6a1b3c5717\transformed\common-18.11.0\AndroidManifest.xml:13:13-35
+74
+75        <activity
+75-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\09500941af01759dbb0006899fca279b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+76            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+76-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\09500941af01759dbb0006899fca279b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+77            android:exported="false"
+77-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\09500941af01759dbb0006899fca279b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+78            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+78-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\09500941af01759dbb0006899fca279b\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
 79        <activity
-79-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:64:9-67:66
-80            android:name="com.sipekat.app.ui.kunjungan.KunjunganDashboardActivity"
-80-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:65:13-68
-81            android:exported="false"
-81-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:66:13-37
-82            android:parentActivityName="com.sipekat.app.ui.main.MainActivity" />
-82-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:67:13-63
-83        <activity
-83-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:69:9-72:85
-84            android:name="com.sipekat.app.ui.kunjungan.VisitListActivity"
-84-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:70:13-59
-85            android:exported="false"
-85-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:71:13-37
-86            android:parentActivityName="com.sipekat.app.ui.kunjungan.KunjunganDashboardActivity" />
-86-->E:\Workingdir\SiPEKAT v3\android-kotlin\app\src\main\AndroidManifest.xml:72:13-82
-87
-88        <!-- Nanti Activity lainnya ditambahkan ke sini -->
-89
-90
-91        <!--
-92        Service for holding metadata. Cannot be instantiated.
-93        Metadata will be merged from other manifests.
-94        -->
-95        <service
-95-->[androidx.camera:camera-core:1.3.4] C:\Users\lhaki\.gradle\caches\8.9\transforms\1cf14be8d5fd7a91418bef24a531cbe3\transformed\jetified-camera-core-1.3.4\AndroidManifest.xml:29:9-33:78
-96            android:name="androidx.camera.core.impl.MetadataHolderService"
-96-->[androidx.camera:camera-core:1.3.4] C:\Users\lhaki\.gradle\caches\8.9\transforms\1cf14be8d5fd7a91418bef24a531cbe3\transformed\jetified-camera-core-1.3.4\AndroidManifest.xml:30:13-75
-97            android:enabled="false"
-97-->[androidx.camera:camera-core:1.3.4] C:\Users\lhaki\.gradle\caches\8.9\transforms\1cf14be8d5fd7a91418bef24a531cbe3\transformed\jetified-camera-core-1.3.4\AndroidManifest.xml:31:13-36
-98            android:exported="false" >
-98-->[androidx.camera:camera-core:1.3.4] C:\Users\lhaki\.gradle\caches\8.9\transforms\1cf14be8d5fd7a91418bef24a531cbe3\transformed\jetified-camera-core-1.3.4\AndroidManifest.xml:32:13-37
-99            <meta-data
-99-->[androidx.camera:camera-camera2:1.3.4] C:\Users\lhaki\.gradle\caches\8.9\transforms\90075bcc70bf70c5c972e6f0f8f80364\transformed\jetified-camera-camera2-1.3.4\AndroidManifest.xml:30:13-32:89
-100                android:name="androidx.camera.core.impl.MetadataHolderService.DEFAULT_CONFIG_PROVIDER"
-100-->[androidx.camera:camera-camera2:1.3.4] C:\Users\lhaki\.gradle\caches\8.9\transforms\90075bcc70bf70c5c972e6f0f8f80364\transformed\jetified-camera-camera2-1.3.4\AndroidManifest.xml:31:17-103
-101                android:value="androidx.camera.camera2.Camera2Config$DefaultProvider" />
-101-->[androidx.camera:camera-camera2:1.3.4] C:\Users\lhaki\.gradle\caches\8.9\transforms\90075bcc70bf70c5c972e6f0f8f80364\transformed\jetified-camera-camera2-1.3.4\AndroidManifest.xml:32:17-86
-102        </service>
-103        <service
-103-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\ccf43414d8504eadf941788b88c09fe6\transformed\jetified-play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:9:9-15:19
-104            android:name="com.google.mlkit.common.internal.MlKitComponentDiscoveryService"
-104-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\ccf43414d8504eadf941788b88c09fe6\transformed\jetified-play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:10:13-91
-105            android:directBootAware="true"
-105-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:17:13-43
-106            android:exported="false" >
-106-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\ccf43414d8504eadf941788b88c09fe6\transformed\jetified-play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:11:13-37
-107            <meta-data
-107-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\ccf43414d8504eadf941788b88c09fe6\transformed\jetified-play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:12:13-14:85
-108                android:name="com.google.firebase.components:com.google.mlkit.vision.text.internal.TextRegistrar"
-108-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\ccf43414d8504eadf941788b88c09fe6\transformed\jetified-play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:13:17-114
-109                android:value="com.google.firebase.components.ComponentRegistrar" />
-109-->[com.google.android.gms:play-services-mlkit-text-recognition-common:19.1.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\ccf43414d8504eadf941788b88c09fe6\transformed\jetified-play-services-mlkit-text-recognition-common-19.1.0\AndroidManifest.xml:14:17-82
-110            <meta-data
-110-->[com.google.mlkit:vision-common:17.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\cb907c096fdd9f1572b6d75b11651fe6\transformed\jetified-vision-common-17.3.0\AndroidManifest.xml:12:13-14:85
-111                android:name="com.google.firebase.components:com.google.mlkit.vision.common.internal.VisionCommonRegistrar"
-111-->[com.google.mlkit:vision-common:17.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\cb907c096fdd9f1572b6d75b11651fe6\transformed\jetified-vision-common-17.3.0\AndroidManifest.xml:13:17-124
-112                android:value="com.google.firebase.components.ComponentRegistrar" />
-112-->[com.google.mlkit:vision-common:17.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\cb907c096fdd9f1572b6d75b11651fe6\transformed\jetified-vision-common-17.3.0\AndroidManifest.xml:14:17-82
-113            <meta-data
-113-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:20:13-22:85
-114                android:name="com.google.firebase.components:com.google.mlkit.common.internal.CommonComponentRegistrar"
-114-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:21:17-120
-115                android:value="com.google.firebase.components.ComponentRegistrar" />
-115-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:22:17-82
-116        </service>
-117
-118        <provider
-118-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:9:9-13:38
-119            android:name="com.google.mlkit.common.internal.MlKitInitProvider"
-119-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:10:13-78
-120            android:authorities="com.sipekat.app.mlkitinitprovider"
-120-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:11:13-69
-121            android:exported="false"
-121-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:12:13-37
-122            android:initOrder="99" />
-122-->[com.google.mlkit:common:18.11.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\f8cc6d5a03b8934f70dd56d140cdd239\transformed\jetified-common-18.11.0\AndroidManifest.xml:13:13-35
-123
-124        <activity
-124-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\724b6e25eccd1eaa33aa953acad370c9\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:9-173
-125            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-125-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\724b6e25eccd1eaa33aa953acad370c9\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:19-85
-126            android:exported="false"
-126-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\724b6e25eccd1eaa33aa953acad370c9\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:146-170
-127            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-127-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\724b6e25eccd1eaa33aa953acad370c9\transformed\jetified-play-services-base-18.5.0\AndroidManifest.xml:5:86-145
-128
-129        <meta-data
-129-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\15e55b350813437ee7cb80f497cb0537\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
-130            android:name="com.google.android.gms.version"
-130-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\15e55b350813437ee7cb80f497cb0537\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
-131            android:value="@integer/google_play_services_version" />
-131-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\15e55b350813437ee7cb80f497cb0537\transformed\jetified-play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
-132
-133        <provider
-133-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\939650b15644b88cd402688d86f3d3b5\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
-134            android:name="androidx.startup.InitializationProvider"
-134-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\939650b15644b88cd402688d86f3d3b5\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:25:13-67
-135            android:authorities="com.sipekat.app.androidx-startup"
-135-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\939650b15644b88cd402688d86f3d3b5\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:26:13-68
-136            android:exported="false" >
-136-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\939650b15644b88cd402688d86f3d3b5\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:27:13-37
-137            <meta-data
-137-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\939650b15644b88cd402688d86f3d3b5\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
-138                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-138-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\939650b15644b88cd402688d86f3d3b5\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:30:17-75
-139                android:value="androidx.startup" />
-139-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\939650b15644b88cd402688d86f3d3b5\transformed\jetified-emoji2-1.3.0\AndroidManifest.xml:31:17-49
-140            <meta-data
-140-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\c891241efa3472e17707fcf922aac0d6\transformed\jetified-lifecycle-process-2.8.6\AndroidManifest.xml:29:13-31:52
-141                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-141-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\c891241efa3472e17707fcf922aac0d6\transformed\jetified-lifecycle-process-2.8.6\AndroidManifest.xml:30:17-78
-142                android:value="androidx.startup" />
-142-->[androidx.lifecycle:lifecycle-process:2.8.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\c891241efa3472e17707fcf922aac0d6\transformed\jetified-lifecycle-process-2.8.6\AndroidManifest.xml:31:17-49
-143            <meta-data
-143-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
-144                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-144-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
-145                android:value="androidx.startup" />
-145-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
-146        </provider>
-147
-148        <uses-library
-148-->[androidx.window:window:1.0.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\75ac7fff9e14a78100deeec5ef4f8fa7\transformed\jetified-window-1.0.0\AndroidManifest.xml:25:9-27:40
-149            android:name="androidx.window.extensions"
-149-->[androidx.window:window:1.0.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\75ac7fff9e14a78100deeec5ef4f8fa7\transformed\jetified-window-1.0.0\AndroidManifest.xml:26:13-54
-150            android:required="false" />
-150-->[androidx.window:window:1.0.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\75ac7fff9e14a78100deeec5ef4f8fa7\transformed\jetified-window-1.0.0\AndroidManifest.xml:27:13-37
-151        <uses-library
-151-->[androidx.window:window:1.0.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\75ac7fff9e14a78100deeec5ef4f8fa7\transformed\jetified-window-1.0.0\AndroidManifest.xml:28:9-30:40
-152            android:name="androidx.window.sidecar"
-152-->[androidx.window:window:1.0.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\75ac7fff9e14a78100deeec5ef4f8fa7\transformed\jetified-window-1.0.0\AndroidManifest.xml:29:13-51
-153            android:required="false" />
-153-->[androidx.window:window:1.0.0] C:\Users\lhaki\.gradle\caches\8.9\transforms\75ac7fff9e14a78100deeec5ef4f8fa7\transformed\jetified-window-1.0.0\AndroidManifest.xml:30:13-37
-154
-155        <service
-155-->[androidx.room:room-runtime:2.6.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\00102c4a9f0a302c6f19e40a58886f0e\transformed\room-runtime-2.6.1\AndroidManifest.xml:24:9-28:63
-156            android:name="androidx.room.MultiInstanceInvalidationService"
-156-->[androidx.room:room-runtime:2.6.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\00102c4a9f0a302c6f19e40a58886f0e\transformed\room-runtime-2.6.1\AndroidManifest.xml:25:13-74
-157            android:directBootAware="true"
-157-->[androidx.room:room-runtime:2.6.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\00102c4a9f0a302c6f19e40a58886f0e\transformed\room-runtime-2.6.1\AndroidManifest.xml:26:13-43
-158            android:exported="false" />
-158-->[androidx.room:room-runtime:2.6.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\00102c4a9f0a302c6f19e40a58886f0e\transformed\room-runtime-2.6.1\AndroidManifest.xml:27:13-37
-159
-160        <receiver
-160-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
-161            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-161-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
-162            android:directBootAware="false"
-162-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
-163            android:enabled="true"
-163-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
-164            android:exported="true"
-164-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
-165            android:permission="android.permission.DUMP" >
-165-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
-166            <intent-filter>
-166-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
-167                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-167-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
-167-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
-168            </intent-filter>
-169            <intent-filter>
-169-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
-170                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-170-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
-170-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
-171            </intent-filter>
-172            <intent-filter>
-172-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
-173                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-173-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
-173-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
-174            </intent-filter>
-175            <intent-filter>
-175-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
-176                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-176-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
-176-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.9\transforms\e22983e7f898f0a3737de74d51da0395\transformed\jetified-profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
-177            </intent-filter>
-178        </receiver>
-179
-180        <service
-180-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:29:9-35:19
-181            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
-181-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:30:13-103
-182            android:exported="false" >
-182-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:31:13-37
-183            <meta-data
-183-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:32:13-34:39
-184                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
-184-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:33:17-94
-185                android:value="cct" />
-185-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.9\transforms\5d99dd705e0a81eed9af7332f0b5d048\transformed\jetified-transport-backend-cct-2.3.3\AndroidManifest.xml:34:17-36
-186        </service>
-187        <service
-187-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\294caa62acc0ed57c52c32d13b5aa64d\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:26:9-30:19
-188            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
-188-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\294caa62acc0ed57c52c32d13b5aa64d\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:27:13-117
-189            android:exported="false"
-189-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\294caa62acc0ed57c52c32d13b5aa64d\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:28:13-37
-190            android:permission="android.permission.BIND_JOB_SERVICE" >
-190-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\294caa62acc0ed57c52c32d13b5aa64d\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:29:13-69
-191        </service>
-192
-193        <receiver
-193-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\294caa62acc0ed57c52c32d13b5aa64d\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:32:9-34:40
-194            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
-194-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\294caa62acc0ed57c52c32d13b5aa64d\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:33:13-132
-195            android:exported="false" />
-195-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.9\transforms\294caa62acc0ed57c52c32d13b5aa64d\transformed\jetified-transport-runtime-2.2.6\AndroidManifest.xml:34:13-37
-196    </application>
-197
-198</manifest>
+79-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\22bbf6b41c5e158ad1bc5d2a62c02c57\transformed\ui-tooling-release\AndroidManifest.xml:23:9-25:39
+80            android:name="androidx.compose.ui.tooling.PreviewActivity"
+80-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\22bbf6b41c5e158ad1bc5d2a62c02c57\transformed\ui-tooling-release\AndroidManifest.xml:24:13-71
+81            android:exported="true" />
+81-->[androidx.compose.ui:ui-tooling-android:1.7.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\22bbf6b41c5e158ad1bc5d2a62c02c57\transformed\ui-tooling-release\AndroidManifest.xml:25:13-36
+82
+83        <provider
+83-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\c1b35a6f705d88a4b96a675aadef2863\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+84            android:name="androidx.startup.InitializationProvider"
+84-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\c1b35a6f705d88a4b96a675aadef2863\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+85            android:authorities="com.jargas.si_pekat.androidx-startup"
+85-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\c1b35a6f705d88a4b96a675aadef2863\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+86            android:exported="false" >
+86-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\c1b35a6f705d88a4b96a675aadef2863\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+87            <meta-data
+87-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\c1b35a6f705d88a4b96a675aadef2863\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+88                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+88-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\c1b35a6f705d88a4b96a675aadef2863\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+89                android:value="androidx.startup" />
+89-->[androidx.emoji2:emoji2:1.3.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\c1b35a6f705d88a4b96a675aadef2863\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+90            <meta-data
+90-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\07a97fec31d7c1440d6d6c9b3ab53191\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:29:13-31:52
+91                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+91-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\07a97fec31d7c1440d6d6c9b3ab53191\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:30:17-78
+92                android:value="androidx.startup" />
+92-->[androidx.lifecycle:lifecycle-process:2.8.7] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\07a97fec31d7c1440d6d6c9b3ab53191\transformed\lifecycle-process-2.8.7\AndroidManifest.xml:31:17-49
+93            <meta-data
+93-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:29:13-31:52
+94                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+94-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:30:17-85
+95                android:value="androidx.startup" />
+95-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:31:17-49
+96        </provider>
+97
+98        <meta-data
+98-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\b163de11721074e6258633e085309ffe\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:9-122
+99            android:name="com.google.android.gms.version"
+99-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\b163de11721074e6258633e085309ffe\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:20-65
+100            android:value="@integer/google_play_services_version" />
+100-->[com.google.android.gms:play-services-basement:18.4.0] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\b163de11721074e6258633e085309ffe\transformed\play-services-basement-18.4.0\AndroidManifest.xml:6:66-119
+101
+102        <receiver
+102-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:34:9-52:20
+103            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+103-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:35:13-76
+104            android:directBootAware="false"
+104-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:36:13-44
+105            android:enabled="true"
+105-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:37:13-35
+106            android:exported="true"
+106-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:38:13-36
+107            android:permission="android.permission.DUMP" >
+107-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:39:13-57
+108            <intent-filter>
+108-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:40:13-42:29
+109                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+109-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:17-91
+109-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:41:25-88
+110            </intent-filter>
+111            <intent-filter>
+111-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:43:13-45:29
+112                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:17-85
+112-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:44:25-82
+113            </intent-filter>
+114            <intent-filter>
+114-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:46:13-48:29
+115                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:17-88
+115-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:47:25-85
+116            </intent-filter>
+117            <intent-filter>
+117-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:49:13-51:29
+118                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:17-95
+118-->[androidx.profileinstaller:profileinstaller:1.3.1] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\20052837241e683a41e41d743b5518d5\transformed\profileinstaller-1.3.1\AndroidManifest.xml:50:25-92
+119            </intent-filter>
+120        </receiver>
+121
+122        <service
+122-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\5ee7e2cba9f81fdc7db343917ad68cb8\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:29:9-35:19
+123            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+123-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\5ee7e2cba9f81fdc7db343917ad68cb8\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:30:13-103
+124            android:exported="false" >
+124-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\5ee7e2cba9f81fdc7db343917ad68cb8\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:31:13-37
+125            <meta-data
+125-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\5ee7e2cba9f81fdc7db343917ad68cb8\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:32:13-34:39
+126                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+126-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\5ee7e2cba9f81fdc7db343917ad68cb8\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:33:17-94
+127                android:value="cct" />
+127-->[com.google.android.datatransport:transport-backend-cct:2.3.3] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\5ee7e2cba9f81fdc7db343917ad68cb8\transformed\transport-backend-cct-2.3.3\AndroidManifest.xml:34:17-36
+128        </service>
+129        <service
+129-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\57a5f87972829ff245fb027d1346524c\transformed\transport-runtime-2.2.6\AndroidManifest.xml:26:9-30:19
+130            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+130-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\57a5f87972829ff245fb027d1346524c\transformed\transport-runtime-2.2.6\AndroidManifest.xml:27:13-117
+131            android:exported="false"
+131-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\57a5f87972829ff245fb027d1346524c\transformed\transport-runtime-2.2.6\AndroidManifest.xml:28:13-37
+132            android:permission="android.permission.BIND_JOB_SERVICE" >
+132-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\57a5f87972829ff245fb027d1346524c\transformed\transport-runtime-2.2.6\AndroidManifest.xml:29:13-69
+133        </service>
+134
+135        <receiver
+135-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\57a5f87972829ff245fb027d1346524c\transformed\transport-runtime-2.2.6\AndroidManifest.xml:32:9-34:40
+136            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+136-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\57a5f87972829ff245fb027d1346524c\transformed\transport-runtime-2.2.6\AndroidManifest.xml:33:13-132
+137            android:exported="false" />
+137-->[com.google.android.datatransport:transport-runtime:2.2.6] C:\Users\lhaki\.gradle\caches\8.11.1\transforms\57a5f87972829ff245fb027d1346524c\transformed\transport-runtime-2.2.6\AndroidManifest.xml:34:13-37
+138    </application>
+139
+140</manifest>

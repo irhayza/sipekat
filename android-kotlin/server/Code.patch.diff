@@ -1,0 +1,417 @@
+--- Code.gs
++++ Code.patched.gs
+@@ -45,6 +45,7 @@
+ //  FUNGSI UTAMA DOPOST (PENGGABUNGAN ROUTING SEMUA SUMBER & OCR)
+ // ═══════════════════════════════════════════════════════════════════════
+ function doPost(e) {
++  let payload = {}; // [PATCH] dipindah ke luar try agar terbaca di blok catch
+   try {
+     const path = e?.pathInfo ? String(e.pathInfo).replace(/^\/+|\/+$/g, '').toLowerCase() : '';
+     const api = String(e?.parameter?.api || '').trim().toLowerCase();
+@@ -58,7 +59,7 @@
+       return ContentService.createTextOutput('OK');
+     }
+ 
+-    let payload = {};
++    payload = {};
+     try {
+       payload = JSON.parse(e.postData.contents); 
+     } catch (err) {
+@@ -73,6 +74,17 @@
+     const actionLower = action.toLowerCase();
+ 
+     // ======================================================
++    // [PATCH v3.1] LOGIN, GANTI PASSWORD, OCR GEMINI (kunci API hanya di Script Properties)
++    // ======================================================
++    if (actionLower === 'login') { return _json(loginHandler_(payload)); }
++    if (actionLower === 'changepassword' || actionLower === 'change_password') { return _json(changePasswordHandler_(payload)); }
++    if (actionLower === 'gemini_ocr') { return _json(geminiOcrHandler_(payload)); }
++    if (GUARDED_ACTIONS_.indexOf(actionLower) !== -1) {
++      const denied = authGuard_(payload);
++      if (denied) { return _json(denied); }
++    }
++
++    // ======================================================
+     // ROUTING CRUD (API Insert, Update, Read, Upload)
+     // ======================================================
+     if (action === "submit_pengaduan") { return _json(doSubmitPengaduan(payload)); } else if (action === "insertRow") {
+@@ -191,7 +203,8 @@
+   var sheetId = payload.sheetId; 
+   var sheetName = payload.sheetName;
+   
+-  var ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
++  assertSheetAllowed_(sheetName);
++  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+   var sheet = ss.getSheetByName(sheetName);
+   if (!sheet) throw new Error("Sheet " + sheetName + " not found");
+   
+@@ -219,7 +232,8 @@
+   var sheetName = payload.sheetName;
+   var data = payload.data; 
+   
+-  var ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
++  assertSheetAllowed_(sheetName);
++  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+   var sheet = ss.getSheetByName(sheetName);
+   if (!sheet) throw new Error("Sheet " + sheetName + " not found");
+   
+@@ -242,7 +256,8 @@
+   var searchVal = String(payload.searchValue);  
+   var data = payload.data; 
+   
+-  var ss = sheetId ? SpreadsheetApp.openById(sheetId) : SpreadsheetApp.getActiveSpreadsheet();
++  assertSheetAllowed_(sheetName);
++  var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+   var sheet = ss.getSheetByName(sheetName);
+   if (!sheet) throw new Error("Sheet " + sheetName + " not found");
+   
+@@ -275,7 +290,7 @@
+ }
+ 
+ function doUploadFile(payload) {
+-  var folderId = payload.folderId;
++  var folderId = FOLDER_ID_SRC1; // [PATCH] folder tujuan tidak boleh ditentukan klien
+   var fileName = payload.fileName;
+   var base64 = payload.base64Data;
+   var mimeType = payload.mimeType || "image/jpeg";
+@@ -603,7 +618,7 @@
+       sh.getRange(activeRow, COL.PENGADUAN).setValue(Validation.sanitize(d.pengaduan));
+       sh.getRange(activeRow, COL.KETERANGAN).setValue(''); 
+       SpreadsheetApp.flush(); clearCache_(); 
+-      notifPengaduanBaru_({ idpel: d.idPelanggan, nama: d.nama, alamat: d.alamat, keluhan: d.pengaduan, tiket: activeData[COL.TICKET - 1], telpon: d.telpon }); 
++      notifPengaduanBaru_({ idpel: d.idPelanggan, nama: d.nama, alamat: d.alamat, keluhan: d.pengaduan, tiket: activeData[COL.TICKET - 1], telpon: d.telpon, petugas: d.petugas }); 
+       return { ok: true, ticket: activeData[COL.TICKET - 1], isOverdueUpdate: true };
+     }
+ 
+@@ -614,7 +629,7 @@
+     sh.getRange(lr + 1, 1, 1, newRow.length).setValues([newRow]);
+     
+     SpreadsheetApp.flush(); clearCache_();
+-    notifPengaduanBaru_({ idpel: d.idPelanggan, nama: d.nama, alamat: d.alamat, keluhan: d.pengaduan, tiket: ticket, telpon: d.telpon }); 
++    notifPengaduanBaru_({ idpel: d.idPelanggan, nama: d.nama, alamat: d.alamat, keluhan: d.pengaduan, tiket: ticket, telpon: d.telpon, petugas: d.petugas }); 
+     return { ok: true, ticket, isOverdueUpdate: false };
+   }
+ };
+@@ -935,6 +950,13 @@
+     if (!sheetName) {
+       return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Parameter sheet tidak diberikan' })).setMimeType(ContentService.MimeType.JSON);
+     }
++    if (isBlockedSheet_(sheetName, true)) {
++      return ContentService.createTextOutput(JSON.stringify({ status: 'error', message: 'Sheet tidak boleh diakses.' })).setMimeType(ContentService.MimeType.JSON);
++    }
++    var deniedGet = authGuard_({ token: e.parameter.token });
++    if (deniedGet) {
++      return ContentService.createTextOutput(JSON.stringify(deniedGet)).setMimeType(ContentService.MimeType.JSON);
++    }
+     try {
+       var ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+       var sheet = ss.getSheetByName(sheetName);
+@@ -1142,6 +1164,8 @@
+       });
+     }
+ 
++    const denied = authGuard_(payload);
++    if (denied) return jsonOutput(denied);
+     const result = syncOcrDapel(payload);
+     return jsonOutput(result);
+   } catch (err) {
+@@ -1157,7 +1181,8 @@
+ // ═══════════════════════════════════════════════════════════════════════
+ function syncOcrDapel(data) {
+   const sheetName = String(data.sheet_name || CONFIG_OCR.SHEET_OCRDAPEL).trim();
+-  const folderId = String(data.drive_folder_id || CONFIG_OCR.DRIVE_FOLDER_ID).trim();
++  const folderId = String(CONFIG_OCR.DRIVE_FOLDER_ID).trim(); // [PATCH] folder tidak boleh ditentukan klien
++  assertSheetAllowed_(sheetName);
+   const idpel = String(data.idpel || '').trim();
+ 
+   if (typeof LoggerService !== 'undefined' && LoggerService.info) {
+@@ -1172,7 +1197,7 @@
+ 
+   let ss;
+   try {
+-    ss = data.spreadsheet_id ? SpreadsheetApp.openById(data.spreadsheet_id) : SpreadsheetApp.getActiveSpreadsheet();
++    ss = SpreadsheetApp.openById(SPREADSHEET_ID); // [PATCH] spreadsheet tidak boleh ditentukan klien
+   } catch (err) {
+     return { status: 'error', error: `Spreadsheet ID tidak valid / tidak bisa diakses: ${err.message}` };
+   }
+@@ -1438,7 +1463,7 @@
+     if (!res.ok) {
+       return { ok: false, status: "error", message: res.message };
+     }
+-    return { ok: true, status: "success", ticket: res.ticket, message: "Pengaduan berhasil disubmit" };
++    return { ok: true, status: "success", ticket: res.ticket, isOverdueUpdate: res.isOverdueUpdate === true, message: "Pengaduan berhasil disubmit" };
+   } catch (e) {
+     Logger.log("doSubmitPengaduan Error: " + e.message);
+     return { ok: false, status: "error", message: e.message };
+@@ -1451,6 +1476,7 @@
+ 
+ function findRowHandler(data) {
+   var sheetName = data.sheetName;
++  assertSheetAllowed_(sheetName);
+   var idpel = data.idpel;
+   var keyColumn = data.keyColumn || 'IDPEL';
+   
+@@ -1491,11 +1517,28 @@
+   
+   if (searchColIndex === -1) return {status: 'error', message: 'Kolom kunci ' + keyColumn + ' tidak ditemukan.'};
+   
++  // [PATCH] filterColumn/filterValue didukung (sebelumnya diabaikan sehingga baris lama ikut terambil)
++  var filterColIndex = -1;
++  if (data.filterColumn) {
++    for (var f = 0; f < headers.length; f++) {
++      if (String(headers[f]).toLowerCase().trim() === String(data.filterColumn).toLowerCase().trim()) { filterColIndex = f; break; }
++    }
++  }
+   var rowIndex = -1;
+-  for (var i = 1; i < values.length; i++) {
+-    if (String(values[i][searchColIndex]).trim() === String(idpel).trim()) {
+-      rowIndex = i;
+-      break;
++  if (filterColIndex !== -1) {
++    for (var i = values.length - 1; i > 0; i--) {
++      if (String(values[i][searchColIndex]).trim() === String(idpel).trim() &&
++          String(values[i][filterColIndex]).trim().toUpperCase() === String(data.filterValue).trim().toUpperCase()) {
++        rowIndex = i;
++        break;
++      }
++    }
++  } else {
++    for (var i = 1; i < values.length; i++) {
++      if (String(values[i][searchColIndex]).trim() === String(idpel).trim()) {
++        rowIndex = i;
++        break;
++      }
+     }
+   }
+   
+@@ -1513,6 +1556,7 @@
+ 
+ function updateRowCellsHandler(data) {
+   var sheetName = data.sheetName;
++  assertSheetAllowed_(sheetName);
+   var idpel = data.idpel;
+   var keyColumn = data.keyColumn || 'IDPEL';
+   var filterColumn = data.filterColumn;
+@@ -1568,6 +1612,7 @@
+   if (rowIndex === -1) return {status: 'error', message: 'Data dengan ' + keyColumn + ' = ' + idpel + ' tidak ditemukan.'};
+   
+   var sheetRow = rowIndex + 1;
++  var skipped = []; // [PATCH] nama kolom yang tidak ada di sheet
+   
+   if (updates) {
+     var keys = Object.keys(updates);
+@@ -1583,6 +1628,8 @@
+       }
+       if (targetCol !== -1) {
+         sheet.getRange(sheetRow, targetCol).setValue(updateVal);
++      } else {
++        skipped.push(updateKey);
+       }
+     }
+   }
+@@ -1598,7 +1645,7 @@
+     }
+   }
+   
+-  return {status: 'success'};
++  return {status: 'success', skipped: skipped};
+ }
+ 
+ function uploadPhotoGeneric(data) {
+@@ -1662,3 +1709,196 @@
+       return { status: 'error', message: String(e) };
+   }
+ }
++
++// ═══════════════════════════════════════════════════════════════════════
++//  [PATCH v3.1] KEAMANAN & SINKRONISASI DENGAN APLIKASI KOTLIN
++//  Script Properties yang dipakai (Project Settings → Script Properties):
++//    GEMINI_API_KEY   (WAJIB utk OCR cloud)  kunci Gemini — HANYA disimpan di sini, tidak pernah di aplikasi
++//    GEMINI_MODEL     (opsional)             default 'gemini-flash-latest'
++//    GEMINI_LIMIT     (opsional)             maks panggilan OCR per petugas per 6 jam, default 150
++//    TOKEN_SECRET     (otomatis dibuat)      rahasia penanda-tangan token login
++//    TOKEN_TTL_DAYS   (opsional)             masa berlaku token login, default 14 hari
++//    REQUIRE_TOKEN    (opsional)             'true' = SEMUA aksi data wajib token (set setelah semua petugas memakai app baru)
++//    ALLOW_LEGACY_LOGIN_READ (opsional)      'true' = sheet LOGIN masih boleh dibaca via GET (HANYA untuk transisi aplikasi Flutter lama)
++// ═══════════════════════════════════════════════════════════════════════
++
++const GUARDED_ACTIONS_ = [
++  'submit_pengaduan', 'insertrow', 'updaterow', 'readsheet', 'uploadfile',
++  'get_dropdown_options', 'get_active_tickets', 'update_penyelesaian', 'get_customer_by_id',
++  'find_row', 'update_row_cells', 'upload_photo', 'notify_selesai'
++];
++const BLOCKED_SHEETS_ = ['login', 'log'];
++const LOGIN_SHEET_NAME_ = 'LOGIN';
++
++/** forRead=true hanya dipakai doGet(read_sheet). ALLOW_LEGACY_LOGIN_READ='true' = masa transisi untuk aplikasi Flutter lama (matikan setelah semua petugas pindah). */
++function isBlockedSheet_(name, forRead) {
++  const n = String(name || '').trim().toLowerCase();
++  if (forRead && n === 'login' && getPropSafe_('ALLOW_LEGACY_LOGIN_READ') === 'true') return false;
++  return BLOCKED_SHEETS_.indexOf(n) !== -1;
++}
++function assertSheetAllowed_(name) { if (isBlockedSheet_(name)) throw new Error('Sheet tidak boleh diakses melalui API.'); }
++
++// ── Token login (HMAC-SHA256, tanpa menyimpan sesi di server) ─────────────
++function tokenSecret_() {
++  const props = PropertiesService.getScriptProperties();
++  let secret = props.getProperty('TOKEN_SECRET');
++  if (!secret) { secret = Utilities.getUuid() + Utilities.getUuid(); props.setProperty('TOKEN_SECRET', secret); }
++  return secret;
++}
++function signToken_(email) {
++  const days = Number(getPropSafe_('TOKEN_TTL_DAYS')) || 14;
++  const body = Utilities.base64EncodeWebSafe(email + '|' + (Date.now() + days * 86400000));
++  const sig = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(body, tokenSecret_()));
++  return body + '.' + sig;
++}
++/** Mengembalikan email pemilik token, atau '' bila token tidak sah / kedaluwarsa. */
++function verifyToken_(token) {
++  try {
++    const parts = String(token || '').split('.');
++    if (parts.length !== 2) return '';
++    const expected = Utilities.base64EncodeWebSafe(Utilities.computeHmacSha256Signature(parts[0], tokenSecret_()));
++    if (expected !== parts[1]) return '';
++    const decoded = Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString().split('|');
++    if (decoded.length !== 2 || Number(decoded[1]) < Date.now()) return '';
++    return decoded[0];
++  } catch (err) { return ''; }
++}
++/** null = lolos. Bila REQUIRE_TOKEN='true' dan token tidak sah → objek galat. */
++function authGuard_(payload) {
++  if (getPropSafe_('REQUIRE_TOKEN') !== 'true') return null;
++  if (verifyToken_(payload && payload.token)) return null;
++  return { status: 'error', ok: false, code: 'AUTH', message: 'Sesi tidak valid atau kedaluwarsa. Silakan login ulang.' };
++}
++
++// ── Login & ganti password (sheet LOGIN: kolom A=user, B=password, C=nama) ──
++function loginHandler_(payload) {
++  try {
++    const user = String(payload.user || '').toLowerCase().trim();
++    const pass = String(payload.password || '').trim();
++    if (!user || !pass) return { status: 'error', message: 'User ID dan password wajib diisi.' };
++
++    const cache = CacheService.getScriptCache();
++    const failKey = 'loginfail_' + user;
++    const fails = Number(cache.get(failKey) || 0);
++    if (fails >= 10) return { status: 'error', message: 'Terlalu banyak percobaan gagal. Coba lagi 15 menit lagi.' };
++
++    const sh = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(LOGIN_SHEET_NAME_);
++    if (!sh) return { status: 'error', message: 'Data login tidak tersedia di server.' };
++    const values = sh.getDataRange().getValues();
++    for (let i = 1; i < values.length; i++) {
++      if (String(values[i][0]).toLowerCase().trim() === user && String(values[i][1]).trim() === pass) {
++        cache.remove(failKey);
++        return { status: 'success', email: user, nama: String(values[i][2] || '').trim(), token: signToken_(user) };
++      }
++    }
++    cache.put(failKey, String(fails + 1), 900);
++    return { status: 'error', message: 'Email atau password salah.' };
++  } catch (err) {
++    return { status: 'error', message: 'Gagal memproses login: ' + String(err.message || err) };
++  }
++}
++
++function changePasswordHandler_(payload) {
++  const user = String(payload.user || '').toLowerCase().trim();
++  const oldPw = String(payload.oldPassword || '').trim();
++  const newPw = String(payload.newPassword || '').trim();
++  const tokenUser = verifyToken_(payload.token);
++  if (!tokenUser || tokenUser !== user) return { status: 'error', code: 'AUTH', message: 'Sesi tidak valid. Silakan login ulang.' };
++  if (newPw.length < 6) return { status: 'error', message: 'Password baru minimal 6 karakter.' };
++  if (newPw === oldPw) return { status: 'error', message: 'Password baru harus berbeda dari password lama.' };
++
++  const lock = LockService.getScriptLock();
++  lock.waitLock(10000);
++  try {
++    const sh = SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(LOGIN_SHEET_NAME_);
++    if (!sh) return { status: 'error', message: 'Data login tidak tersedia di server.' };
++    const values = sh.getDataRange().getValues();
++    for (let i = 1; i < values.length; i++) {
++      if (String(values[i][0]).toLowerCase().trim() === user) {
++        if (String(values[i][1]).trim() !== oldPw) return { status: 'error', message: 'Password lama salah.' };
++        sh.getRange(i + 1, 2).setValue(newPw);
++        return { status: 'success', message: 'Password berhasil diubah.' };
++      }
++    }
++    return { status: 'error', message: 'Akun tidak ditemukan.' };
++  } finally {
++    lock.releaseLock();
++  }
++}
++
++// ── OCR Gemini: kunci API hanya di Script Properties; prompt & skema dikunci di server ──
++const GEMINI_PROMPT_ = 'Anda adalah sistem pembaca stand meter gas dari foto yang diambil petugas di lapangan.\n\n' +
++  'Pada foto ini, fokus HANYA pada satu deret angka mekanik (roda counter) yang:\n' +
++  '- Berwarna PUTIH/TERANG di atas LATAR BELAKANG HITAM/GELAP\n' +
++  '- Berjumlah 5 digit, dengan jarak antar digit agak renggang (masing-masing digit berada di kotak/roda sendiri)\n' +
++  '- Adalah kelompok digit UTAMA/TERBESAR pada jendela angka meteran, dan merupakan angka cetak/roda mekanik ASLI — BUKAN tulisan tangan, coretan, atau stiker di badan meteran\n\n' +
++  'ABAIKAN SEPENUHNYA, jangan pernah dimasukkan ke hasil:\n' +
++  '- Digit dengan latar belakang MERAH atau yang dikelilingi kotak/garis MERAH (itu sub-meter desimal/dm3, BUKAN bagian dari pembacaan ini)\n' +
++  '- Tulisan tangan, coretan, stiker, atau angka apa pun yang ditulis manual di badan meteran\n' +
++  '- Barcode, nomor seri, merek, tahun produksi, satuan (m3/dm3), atau teks lain di luar jendela angka utama\n\n' +
++  'Tentukan sendiri secara otomatis di mana letak jendela angka utama tersebut di dalam foto — posisinya bisa di mana saja dalam foto, jangan berasumsi selalu di tengah.\n\n' +
++  'Jika gambar buram, terpotong, tertutup pantulan cahaya/silau, atau angka tidak bisa dipastikan dengan yakin, set "terbaca" menjadi false dan kosongkan "angka".\n\n' +
++  'Jawab HANYA dengan JSON sesuai skema yang diberikan, tanpa penjelasan tambahan.';
++
++const GEMINI_SCHEMA_ = {
++  type: 'OBJECT',
++  properties: {
++    angka: { type: 'STRING', description: 'Deret digit 0-9 dari angka putih di atas latar hitam, tanpa spasi/simbol. Kosongkan jika tidak yakin.' },
++    jumlah_digit: { type: 'INTEGER', description: 'Jumlah digit pada field angka.' },
++    terbaca: { type: 'BOOLEAN', description: 'true jika yakin terbaca dengan jelas, false jika ragu/buram.' }
++  },
++  required: ['angka', 'jumlah_digit', 'terbaca']
++};
++
++function geminiOcrHandler_(payload) {
++  try {
++    const email = verifyToken_(payload.token);
++    if (!email) return { status: 'error', code: 'AUTH', message: 'Sesi OCR cloud tidak valid atau kedaluwarsa. Keluar lalu masuk lagi.' };
++
++    const apiKey = getPropSafe_('GEMINI_API_KEY');
++    if (!apiKey) return { status: 'error', code: 'CONFIG', message: 'GEMINI_API_KEY belum diatur di Script Properties server.' };
++
++    const b64 = String(payload.image_base64 || '').replace(/^data:.+;base64,/, '');
++    if (!b64) return { status: 'error', message: 'Foto kosong.' };
++    if (b64.length > 4000000) return { status: 'error', message: 'Foto terlalu besar untuk OCR.' };
++
++    // Batas pemakaian per petugas (CacheService maks 6 jam → jendela 6 jam)
++    const limit = Number(getPropSafe_('GEMINI_LIMIT')) || 150;
++    const cache = CacheService.getScriptCache();
++    const qKey = 'gemq_' + email + '_' + Math.floor(Date.now() / 21600000);
++    const used = Number(cache.get(qKey) || 0);
++    if (used >= limit) return { status: 'error', code: 'QUOTA', message: 'Batas OCR cloud tercapai, coba lagi nanti atau pakai OCR lokal.' };
++    cache.put(qKey, String(used + 1), 21600);
++
++    const model = getPropSafe_('GEMINI_MODEL') || 'gemini-flash-latest';
++    const res = UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + encodeURIComponent(model) + ':generateContent', {
++      method: 'post',
++      contentType: 'application/json',
++      headers: { 'x-goog-api-key': apiKey },
++      payload: JSON.stringify({
++        contents: [{ parts: [{ inlineData: { mimeType: 'image/jpeg', data: b64 } }, { text: GEMINI_PROMPT_ }] }],
++        generationConfig: { temperature: 0, responseMimeType: 'application/json', responseSchema: GEMINI_SCHEMA_ }
++      }),
++      muteHttpExceptions: true
++    });
++
++    const code = res.getResponseCode();
++    const text = res.getContentText();
++    if (code !== 200) {
++      if (typeof LoggerService !== 'undefined') LoggerService.warn('Gemini HTTP ' + code, { body: String(text).substring(0, 300) });
++      if (code === 400 || code === 403) return { status: 'error', code: 'UPSTREAM', message: 'Gemini menolak permintaan (periksa GEMINI_API_KEY dan akses model).' };
++      if (code === 404) return { status: 'error', code: 'UPSTREAM', message: 'Model Gemini "' + model + '" tidak ditemukan.' };
++      if (code === 429) return { status: 'error', code: 'UPSTREAM', message: 'Kuota Gemini habis sementara, coba lagi nanti.' };
++      return { status: 'error', code: 'UPSTREAM', message: 'Gemini error (' + code + ').' };
++    }
++
++    const body = JSON.parse(text);
++    const parts = body.candidates && body.candidates[0] && body.candidates[0].content && body.candidates[0].content.parts;
++    const partText = parts && parts.map(function (p) { return p.text; }).filter(Boolean)[0];
++    if (!partText) return { status: 'error', message: 'Respons Gemini kosong (mungkin diblokir filter keamanan).' };
++    const parsed = JSON.parse(partText);
++    return { status: 'success', angka: String(parsed.angka || ''), jumlah_digit: Number(parsed.jumlah_digit || 0), terbaca: parsed.terbaca === true };
++  } catch (err) {
++    return { status: 'error', message: 'Gagal memproses OCR: ' + String(err && err.message || err) };
++  }
++}

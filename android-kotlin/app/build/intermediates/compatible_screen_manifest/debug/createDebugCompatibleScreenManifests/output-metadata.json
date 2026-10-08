@@ -4,7 +4,7 @@
     "type": "COMPATIBLE_SCREEN_MANIFEST",
     "kind": "Directory"
   },
-  "applicationId": "com.sipekat.app",
+  "applicationId": "com.jargas.si_pekat",
   "variantName": "debug",
   "elements": []
 }
