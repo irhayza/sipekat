@@ -1,0 +1,125 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - kotlin-native
+      - master
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Ambil Perubahan Kode (Git Diff)
+        id: diff
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            git diff ${{ github.event.pull_request.base.sha }} ${{ github.sha }} > changes.diff
+          else
+            # Untuk event push, bandingkan dengan commit sebelumnya
+            git diff HEAD~1 HEAD > changes.diff || touch changes.diff
+          fi
+
+          DIFF_SIZE=$(wc -c < changes.diff)
+          echo "Ukuran diff: $DIFF_SIZE bytes"
+          echo "diff_size=$DIFF_SIZE" >> $GITHUB_OUTPUT
+
+      - name: Jalankan AI Review via Gemini API
+        if: steps.diff.outputs.diff_size > 0
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          python3 - << 'EOF'
+          import os
+          import json
+          import urllib.request
+
+          api_key = os.environ.get("GEMINI_API_KEY")
+          if not api_key:
+              print("Error: GEMINI_API_KEY tidak ditemukan.")
+              exit(1)
+
+          with open("changes.diff", "r", encoding="utf-8", errors="ignore") as f:
+              diff_content = f.read()
+
+          # Batasi ukuran diff jika terlalu panjang agar tidak melebihi kuota/konteks
+          max_chars = 30000
+          if len(diff_content) > max_chars:
+              diff_content = diff_content[:max_chars] + "\n\n... [diff terpotong karena terlalu panjang]"
+
+          prompt = f"""Kamu adalah senior code reviewer untuk aplikasi Android Kotlin & Jetpack Compose.
+          Tinjau perubahan kode (git diff) berikut. Berikan feedback dalam bahasa Indonesia dengan format:
+          1. **Ringkasan Perubahan**: Apa saja yang diubah atau ditambahkan.
+          2. **Potensi Masalah / Bug**: Cek null-safety, lifecycle Android, Compose recomposition, performa, atau security issue.
+          3. **Saran Peningkatan**: Saran clean code, arsitektur, atau best practice Kotlin.
+
+          Jika perubahannya minor atau sudah baik, berikan apresiasi singkat dan catatan kecil jika ada.
+
+          Git Diff:
+          ```diff
+          {diff_content}
+          ```
+          """
+
+          url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+          payload = {
+              "contents": [{
+                  "parts": [{"text": prompt}]
+              }],
+              "generationConfig": {
+                  "temperature": 0.2
+              }
+          }
+
+          req = urllib.request.Request(
+              url,
+              data=json.dumps(payload).encode("utf-8"),
+              headers={"Content-Type": "application/json"}
+          )
+
+          try:
+              with urllib.request.urlopen(req) as response:
+                  res_data = json.loads(response.read().decode("utf-8"))
+                  review_text = res_data["candidates"][0]["content"]["parts"][0]["text"]
+                  
+                  with open("review.md", "w", encoding="utf-8") as out:
+                      out.write(review_text)
+          except Exception as e:
+              print(f"Gagal memanggil Gemini API: {e}")
+              with open("review.md", "w", encoding="utf-8") as out:
+                  out.write(f"⚠️ Gagal melakukan AI review: {e}")
+          EOF
+
+      - name: Kirim Komentar ke Pull Request
+        if: github.event_name == 'pull_request' && steps.diff.outputs.diff_size > 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMENT_BODY=$(cat review.md)
+          gh pr comment ${{ github.event.pull_request.number }} --body "### 🤖 Gemini AI Code Review
+
+          $COMMENT_BODY"
+
+      - name: Tampilkan di Step Summary (Event Push)
+        if: github.event_name == 'push' && steps.diff.outputs.diff_size > 0
+        run: |
+          echo "### 🤖 Gemini AI Code Review" >> $GITHUB_STEP_SUMMARY
+          cat review.md >> $GITHUB_STEP_SUMMARY
