@@ -421,9 +421,14 @@ function processWahaUpdate_(update) {
 
     const isAdmin = isAdminChat_(from);
 
+    // Mode debug: isi Script Property DEBUG_WA = true untuk mencatat tiap pesan masuk ke sheet Log
+    if (getPropSafe_('DEBUG_WA') === 'true') {
+      LoggerService.info('WA masuk', { build: BUILD_ID_, from: from, admin: isAdmin, teks: originalText.substring(0, 40) });
+    }
+
     // Cek identitas pengirim (membantu bila nomor Anda tidak dikenali sebagai admin)
     if (text === '#id') {
-      return reply_(from, '🆔 ID WhatsApp Anda: <code>' + from + '</code>\n' + (isAdmin ? 'Status: <b>ADMIN</b> (asisten aktif)' : 'Status: <b>bukan admin</b> (dilayani sebagai pelanggan)'));
+      return reply_(from, '🆔 ID WhatsApp Anda: <code>' + from + '</code>\nBuild kode: <code>' + BUILD_ID_ + '</code>\n' + (isAdmin ? 'Status: <b>ADMIN</b> (asisten aktif)' : 'Status: <b>bukan admin</b> (dilayani sebagai pelanggan)'));
     }
 
     // Perintah manual. Perubahan dari versi lama:
@@ -970,6 +975,9 @@ function notifSelesai_(data) {
 function doGet(e) {
   const path = e?.pathInfo ? String(e.pathInfo).replace(/^\/+|\/+$/g, '').toLowerCase() : '';
   const api = String(e?.parameter?.api || '').trim().toLowerCase();
+  if (api === 'build') {
+    return ContentService.createTextOutput(JSON.stringify({ status: 'ok', build: BUILD_ID_ })).setMimeType(ContentService.MimeType.JSON);
+  }
 
   if (api === 'ocr' || path === 'ocr') {
     return ContentService.createTextOutput(JSON.stringify({ status: 'ok', service: 'ocr_bridge', message: 'OCR bridge ready' })).setMimeType(ContentService.MimeType.JSON);
@@ -2059,6 +2067,8 @@ Chat dari pelanggan: "${text}"
 // ───────────────────────────────────────────────────────────────────────
 //  BAGIAN 3 — ASISTEN ADMIN (baca data langsung, ubah data dengan konfirmasi)
 // ───────────────────────────────────────────────────────────────────────
+const BUILD_ID_ = 'asisten-2026-10-08-e';
+
 const ASSISTANT_ = {
   DEFAULT_MODEL: 'gemini-flash-latest',
   FALLBACK_MODEL: 'gemini-flash-lite-latest',
@@ -2368,4 +2378,36 @@ function assistantApplyUpdate_(chatId, p) {
 // ── uji dari editor Apps Script: cek kunci & model Gemini tanpa lewat WhatsApp ──
 function ujiGemini() {
   Logger.log(callGeminiChat_('Balas satu kata saja: siap', false));
+}
+
+// ── DIAGNOSA (jalankan dari editor Apps Script, lihat hasilnya di Eksekusi/Log) ──
+
+// 1) Tampilkan pengaturan penting (kunci/rahasia hanya ditulis ADA/KOSONG)
+function diagnosa() {
+  const ada = k => (getPropSafe_(k) ? 'ADA' : 'KOSONG');
+  let url = '';
+  try { url = ScriptApp.getService().getUrl(); } catch (e) { url = '(tidak tersedia: ' + e.message + ')'; }
+  Logger.log([
+    'Build kode        : ' + BUILD_ID_,
+    'URL dari editor   : ' + url + '  (dari editor bisa berupa alamat uji /dev, bukan /exec; jangan dipakai membandingkan dengan WAHA)',
+    'ADMIN_NUMBERS     : ' + (getPropSafe_('ADMIN_NUMBERS') || '(kosong, pakai daftar bawaan kode)'),
+    'GEMINI_API_KEY    : ' + ada('GEMINI_API_KEY'),
+    'GEMINI_MODEL      : ' + (getPropSafe_('GEMINI_MODEL') || '(kosong, pakai ' + ASSISTANT_.DEFAULT_MODEL + ')'),
+    'WAHA_URL          : ' + ada('WAHA_URL'),
+    'WAHA_API_KEY      : ' + ada('WAHA_API_KEY'),
+    'WAHA_SESSION      : ' + (getPropSafe_('WAHA_SESSION') || '(kosong, dianggap default)'),
+    'WA_ID             : ' + (getPropSafe_('WA_ID') || '(kosong)'),
+    'DEBUG_WA          : ' + (getPropSafe_('DEBUG_WA') || '(mati)')
+  ].join('\n'));
+}
+
+// 2) Tiru pesan masuk dari WhatsApp admin TANPA lewat webhook.
+//    Balasan dikirim ke WhatsApp Anda lewat WAHA. Ganti chatId sesuai balasan "#id".
+function ujiAlurWA() {
+  const chatId = '126005884797153@lid';
+  processWahaUpdate_({
+    event: 'message',
+    payload: { id: 'uji-' + Date.now(), from: chatId, fromMe: false, body: 'Halo, ada berapa tiket yang masih open?' }
+  });
+  Logger.log('Selesai diproses. Cek WhatsApp Anda; bila tidak ada balasan, lihat sheet Log.');
 }
