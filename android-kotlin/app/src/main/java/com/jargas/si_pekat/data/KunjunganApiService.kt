@@ -185,7 +185,10 @@ object KunjunganApiService {
                 if (statusIndex != null && cells[statusIndex].trim().lowercase() != "y") continue
                 if (!isAdmin && petugasIndex != null && normalizeComparable(cells[petugasIndex]) != normalizedPetugas) continue
 
-                result.add(build(kendala = cells.cell(kondisiIndex), alamat = cells.cell(alamatIndex)))
+                val candidate = build(kendala = cells.cell(kondisiIndex), alamat = cells.cell(alamatIndex))
+                // Tunggakan 0 dan 1 bulan tidak dikunjungi (BLN kosong dianggap 0).
+                if (!candidate.eligibleForVisit) continue
+                result.add(candidate)
             } else if (menu == "pembukaan") {
                 // PENGADUAN_RP memuat 'buka segel'/'pasang kembali' dan STATUS_RP = open
                 if (kondisiIndex == null || statusIndex == null) continue

@@ -62,6 +62,13 @@ object AppConfig {
     )
     const val MGRT_BARU_TRIGGER = "penggantian mgrt"
 
+    // ── DAFTAR KUNJUNGAN ───────────────────────────────────────────────────
+    /** Pelanggan dengan tunggakan 0 dan 1 bulan tidak ditampilkan di daftar Kunjungan (hanya ≥ 2 bulan). */
+    const val MIN_ARREARS_MONTHS = 2
+
+    /** Semua IDPEL berpanjang 10 digit → server baru ditanya setelah ID lengkap. */
+    const val CUSTOMER_ID_LENGTH = 10
+
     // ── STATUS ─────────────────────────────────────────────────────────────
     const val STATUS_OPEN = "OPEN"
     const val STATUS_PROSES = "PROSES"

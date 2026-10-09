@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ═══════════════════════════════════════════════════════════════════════
  * GABUNGAN SISTEM PENGADUAN v9.6, SISTEM MANAJEMEN CABUT/SET, API CRUD, 
  * & OCR SINKRONISASI v2 (PATCHED)
@@ -45,6 +45,8 @@ const STATUS = { OPEN: 'OPEN', PROSES: 'PROSES', SELESAI: 'SELESAI' };
 //  FUNGSI UTAMA DOPOST (PENGGABUNGAN ROUTING SEMUA SUMBER & OCR)
 // ═══════════════════════════════════════════════════════════════════════
 function doPost(e) {
+  const whKey = PropertiesService.getScriptProperties().getProperty('WAHA_WEBHOOK_KEY');
+  if (whKey && e?.parameter?.key !== whKey) return ContentService.createTextOutput("Unauthorized");
   let payload = {}; // [PATCH] dipindah ke luar try agar terbaca di blok catch
   try {
     const path = e?.pathInfo ? String(e.pathInfo).replace(/^\/+|\/+$/g, '').toLowerCase() : '';
@@ -412,6 +414,9 @@ function processWahaUpdate_(update) {
     // 1. Abaikan pesan dari bot sendiri atau broadcast
     if (payload.fromMe === true || payload.id?.fromMe === true) return;
     
+    const from = String(payload.from || '').trim();
+    if (from.endsWith('@g.us') || from === 'status@broadcast') return;
+    
     // 2. Dukung semua event pesan (message, message.any, message.upsert)
     const eventName = String(update.event || '');
     if (!eventName.includes('message')) return;
@@ -419,7 +424,6 @@ function processWahaUpdate_(update) {
     const rawText = payload.body || payload.text || payload.message?.conversation || payload.message?.extendedTextMessage?.text || '';
     const text = normalizeText_(rawText);
     const originalText = rawText.trim();
-    const from = String(payload.from || '').trim();
 
     if (!text || from === 'status@broadcast') return;
 
@@ -533,48 +537,14 @@ const DapellService = {
   getById: function(id) {
     const target = String(id).trim();
     if (!target) return null;
-    
-    const cache = CacheService.getScriptCache();
-    let dapellMapStr = cache.get('DapellMap');
-    let dapellMap = null;
-    
-    if (dapellMapStr) {
-      dapellMap = JSON.parse(dapellMapStr);
-    } else {
-      try {
-        const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_DAPELL);
-        if (!sh || sh.getLastRow() < 2) return null;
-        const data = sh.getRange(2, 1, sh.getLastRow() - 1, 10).getValues();
-        dapellMap = {};
-        for (let i = 0; i < data.length; i++) {
-          let k = String(data[i][0]).trim();
-          if (k) {
-            dapellMap[k] = { nama: clean_(data[i][1]), alamat: clean_(data[i][2]), petugas: clean_(data[i][8]), kodeWilayah: clean_(data[i][9]) };
-          }
-        }
-        const str = JSON.stringify(dapellMap);
-        if (str.length < 100000) {
-          cache.put('DapellMap', str, 21600);
-        }
-      } catch (e) {}
-    }
-    
-    if (dapellMap) {
-      if (dapellMap[target]) return dapellMap[target];
-    }
-    
     try {
       const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CONFIG.SHEET_DAPELL);
-      if (!sh || sh.getLastRow() < 2) return null;
-      const ids = sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues();
-      for (let i = 0; i < ids.length; i++) {
-        if (String(ids[i][0]).trim() === target) {
-          const r = sh.getRange(i + 2, 1, 1, 10).getValues()[0];
-          return { nama: clean_(r[1]), alamat: clean_(r[2]), petugas: clean_(r[8]), kodeWilayah: clean_(r[9]) };
-        }
-      }
-    } catch (e) { LoggerService.error('DapellService Error', { error: e.message }); }
-    return null;
+      if (!sh) return null;
+      const tf = sh.getRange(2, 1, sh.getLastRow(), 1).createTextFinder(target).matchEntireCell(true).findNext();
+      if (!tf) return null;
+      const r = sh.getRange(tf.getRow(), 1, 1, 10).getValues()[0];
+      return { nama: clean_(r[1]), alamat: clean_(r[2]), petugas: clean_(r[8]), kodeWilayah: clean_(r[9]) };
+    } catch (e) { return null; }
   }
 };
 
@@ -684,13 +654,8 @@ function handleLapor_(chatId, payload) {
   if (cleanChatId.startsWith('0')) {
     cleanChatId = '62' + cleanChatId.substring(1);
   }
-  const allowedNumbers = [
-    '126005884797153', //6285731669222
-    '150341068787799', //6281333310874
-    '239869779538055', //6285731333794
-    '220542326034620', //6281703708467
-    '228672950763573'  //6285175081338
-  ];
+  const allowedNumbersStr = getPropSafe_('ADMIN_NUMBERS');
+  const allowedNumbers = allowedNumbersStr ? allowedNumbersStr.split(',').map(s => s.trim().replace(/[^0-9]/g, '')) : [];
   if (!allowedNumbers.includes(cleanChatId)) {
     return reply_(chatId, `❌ <b>MAAF, AKSES DITOLAK</b> untuk nomor ${cleanChatId}\n\nUntuk membuat laporan pengaduan, silakan gunakan <b>Aplikasi</b> atau hubungi Customer Service kami di nomor WhatsApp: <b>085161222706</b>`);
   }
@@ -1123,7 +1088,7 @@ function sendWhatsAppTo_(chatId, htmlText) {
 }
 
 function testWAHA() {
-  const nomorTujuan = "6285161222706"; 
+  const nomorTujuan = "6280000000000"; 
   const wahaUrl = getPropSafe_('WAHA_URL').replace(/\/$/, '');
   const apiKey = getPropSafe_('WAHA_API_KEY');
   const session = getPropSafe_('WAHA_SESSION') || 'default';
@@ -2019,53 +1984,72 @@ function callGeminiChat_(prompt, requireJson = false, opts = {}) {
 }
 
 function handleGeminiCS_(chatId, text) {
-  const systemPrompt = `
-Anda adalah Customer Service (CS) jargas Sidoarjo. Tugas Anda melayani pelanggan yang ingin lapor gangguan.
-Syarat laporan yang valid harus memiliki: 1. ID Pelanggan (numerik), 2. Nama, 3. Alamat, 4. Keluhan/Kendala, 5. No Telepon.
-
-Jika informasi DARI CHAT PELANGGAN INI belum lengkap, balaslah dengan ramah (bahasa Indonesia yang sopan) menanyakan data yang kurang.
-JANGAN gunakan format JSON jika data belum lengkap, balas dengan teks biasa.
-
-JIKA SEMUA DATA SUDAH LENGKAP di chat ini, Anda WAJIB merespon HANYA dengan format JSON valid persis seperti skema berikut tanpa teks lain:
-{
-  "status": "lengkap",
-  "data": {
-    "idPelanggan": "...",
-    "nama": "...",
-    "alamat": "...",
-    "pengaduan": "...",
-    "telpon": "..."
+  const cache = CacheService.getScriptCache();
+  const limitStr = PropertiesService.getScriptProperties().getProperty('CS_LIMIT_PER_HOUR');
+  if (limitStr) {
+    const limit = parseInt(limitStr, 10);
+    const limKey = 'cs_limit_' + chatId;
+    let count = parseInt(cache.get(limKey) || '0', 10);
+    if (count >= limit) {
+      if (count === limit) {
+        reply_(chatId, 'Maaf, Anda mengirim terlalu banyak pesan. Silakan coba lagi nanti.');
+        cache.put(limKey, String(count + 1), 3600);
+      }
+      return;
+    }
+    cache.put(limKey, String(count + 1), 3600);
   }
-}
 
-Chat dari pelanggan: "${text}"
-  `;
+  const histKey = 'cs_hist_' + chatId;
+  let history = [];
+  try { history = JSON.parse(cache.get(histKey) || '[]'); } catch (e) {}
 
-  reply_(chatId, '⏳ _CS AI sedang mengetik..._');
+  const systemPrompt = `Anda adalah Customer Service (CS) jargas Sidoarjo. Tugas Anda melayani pelanggan yang ingin lapor gangguan.
+Syarat laporan yang valid harus memiliki: 1. ID Pelanggan (numerik), 2. Nama, 3. Alamat, 4. Keluhan/Kendala, 5. No Telepon.
+Jika informasi belum lengkap, balas dengan ramah menanyakan data yang kurang. JANGAN gunakan format JSON jika data belum lengkap, balas dengan teks biasa.
+JIKA SEMUA DATA SUDAH LENGKAP, Anda WAJIB merespon HANYA dengan format JSON valid persis seperti skema berikut tanpa teks lain:
+\`\`\`json
+{"status":"lengkap","data":{"idPelanggan":"...","nama":"...","alamat":"...","pengaduan":"...","telpon":"..."}}
+\`\`\``;
+
+  reply_(chatId, '💬 _CS AI sedang mengetik..._');
   
   try {
-    const responseText = callGeminiChat_(systemPrompt, false).trim();
+    const responseText = callGeminiChat_(text, false, { system: systemPrompt, history: history }).trim();
     
-    if (responseText.startsWith('{') && responseText.endsWith('}')) {
-      const parsed = JSON.parse(responseText);
-      if (parsed.status === "lengkap") {
+    let jsonMatch = responseText.match(/```json\s*(\{[\s\S]*?\})\s*```/);
+    if (!jsonMatch) jsonMatch = responseText.match(/^(\{[\s\S]*?\})$/);
+    
+    if (jsonMatch) {
+      let parsed;
+      try { parsed = JSON.parse(jsonMatch[1]); } catch(e) {}
+      if (parsed && parsed.status === 'lengkap' && parsed.data) {
+        for (let k in parsed.data) {
+          if (typeof parsed.data[k] === 'number') parsed.data[k] = String(parsed.data[k]);
+        }
         const res = PengaduanService.submit(parsed.data);
         if (res.ok) {
           reply_(chatId, `✅ *LAPORAN BERHASIL DICATAT*\n\nTerima kasih, laporan Anda telah kami rangkum dan teruskan ke petugas.\n🎫 *TIKET ANDA:* ${res.ticket}\n\nKetik #CEK#${res.ticket} untuk memantau status.`);
+          cache.remove(histKey);
+          return;
         } else {
-          reply_(chatId, `⏳ MAAF, LAPORAN DITOLAK: ${res.message}`);
+          reply_(chatId, `❌ MAAF, LAPORAN DITOLAK: ${res.message}`);
         }
-        return;
       }
     }
     
     reply_(chatId, responseText);
+    history.push({ role: 'user', text: text });
+    history.push({ role: 'model', text: responseText });
+    if (history.length > 10) history = history.slice(-10);
+    cache.put(histKey, JSON.stringify(history), 1800);
     
   } catch (e) {
     LoggerService.error('Gemini CS Error', { error: e.message });
-    reply_(chatId, '❌ _Maaf, sistem CS sedang sibuk. Silakan gunakan format manual: #LAPOR#ID#NAMA#ALAMAT#KENDALA#NOTELEPON_');
+    reply_(chatId, '🙏 _Maaf, sistem CS sedang sibuk. Silakan gunakan format manual: #LAPOR#ID#NAMA#ALAMAT#KENDALA#NOTELEPON_');
   }
 }
+
 
 // ───────────────────────────────────────────────────────────────────────
 //  BAGIAN 3 — ASISTEN ADMIN (baca data langsung, ubah data dengan konfirmasi)
@@ -2085,7 +2069,7 @@ const ASSISTANT_ = {
 function isAdminChat_(chatId) {
   let id = String(chatId || '').replace(/[^0-9]/g, '');
   if (id.startsWith('0')) id = '62' + id.substring(1);
-  const list = (getPropSafe_('ADMIN_NUMBERS') || '126005884797153,6285731669222')
+  const list = (getPropSafe_('ADMIN_NUMBERS') || '')
     .split(',').map(s => s.replace(/[^0-9]/g, '')).filter(Boolean);
   return list.indexOf(id) !== -1;
 }
@@ -2407,7 +2391,7 @@ function diagnosa() {
 // 2) Tiru pesan masuk dari WhatsApp admin TANPA lewat webhook.
 //    Balasan dikirim ke WhatsApp Anda lewat WAHA. Ganti chatId sesuai balasan "#id".
 function ujiAlurWA() {
-  const chatId = '126005884797153@lid';
+  const chatId = '6280000000000@c.us';
   processWahaUpdate_({
     event: 'message',
     payload: { id: 'uji-' + Date.now(), from: chatId, fromMe: false, body: 'Halo, ada berapa tiket yang masih open?' }

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.jargas.si_pekat.config.AppConfig
 import com.jargas.si_pekat.core.ApiException
 import com.jargas.si_pekat.core.ContactLauncher
 import com.jargas.si_pekat.data.AppSessionCache
@@ -217,7 +218,9 @@ private fun CustomerListScreen(isReopen: Boolean, onBack: () -> Unit) {
     val filtered = remember(customers, query, isReopen) {
         val q = query.lowercase()
         customers.filter {
-            it.idpel.lowercase().contains(q) || it.nama.lowercase().contains(q) || (!isReopen && it.alamat.lowercase().contains(q))
+            // Kunjungan: sembunyikan tunggakan 0 dan 1 bulan (juga pada daftar offline lama yang tersimpan sebelum filter ada).
+            (isReopen || it.eligibleForVisit) &&
+                (it.idpel.lowercase().contains(q) || it.nama.lowercase().contains(q) || (!isReopen && it.alamat.lowercase().contains(q)))
         }
     }
 
@@ -253,7 +256,7 @@ private fun CustomerListScreen(isReopen: Boolean, onBack: () -> Unit) {
                 errorMsg != null -> EmptyState(Icons.Rounded.CloudOff, "Gagal memuat data", errorMsg!!, actionLabel = "Coba Lagi", onAction = { fetch(force = true) })
                 filtered.isEmpty() -> EmptyState(
                     Icons.Rounded.Inbox, "Tidak Ada Data",
-                    if (isReopen) "Tidak ada data pembukaan segel/cabut untuk saat ini." else "Tidak ada data kunjungan penutupan untuk saat ini.",
+                    if (isReopen) "Tidak ada data pembukaan segel/cabut untuk saat ini." else "Tidak ada pelanggan dengan tunggakan ${AppConfig.MIN_ARREARS_MONTHS} bulan atau lebih untuk dikunjungi saat ini.",
                 )
                 else -> PullToRefreshBox(isRefreshing = refreshing, onRefresh = { fetch(force = true) }, modifier = Modifier.fillMaxSize()) {
                     LazyColumn(contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 4.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {

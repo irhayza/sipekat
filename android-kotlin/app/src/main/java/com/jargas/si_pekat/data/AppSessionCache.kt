@@ -62,6 +62,14 @@ object AppSessionCache {
 
     // ── Cache global dbase (autofill seluruh form) ──
     @Volatile var dapellCustomers: List<Customer> = emptyList()
+        set(value) {
+            field = value
+            dapellIndex = HashMap<String, Customer>(value.size * 2).also { m -> value.forEach { m[it.noPelanggan.trim()] = it } }
+        }
+
+    /** Indeks IDPEL → pelanggan untuk pencarian instan (autofill form Pengaduan), dibangun otomatis saat dbase dimuat. */
+    @Volatile var dapellIndex: Map<String, Customer> = emptyMap()
+        private set
     @Volatile var dapellError: String? = null
     @Volatile var dapellLoading = false
 
@@ -257,7 +265,7 @@ object AppSessionCache {
         val id = rawId.trim().lowercase()
         if (id.isEmpty()) return null
 
-        dapellCustomers.firstOrNull { it.noPelanggan.lowercase() == id || it.id.lowercase() == id }?.let {
+        dapellIndex[rawId.trim()]?.let {
             return CachedCustomerMatch(it.noPelanggan, it.nama, it.alamat ?: "", "", "Dapell")
         }
         perbaikanTickets.firstOrNull { it.idPelanggan.lowercase() == id }?.let {

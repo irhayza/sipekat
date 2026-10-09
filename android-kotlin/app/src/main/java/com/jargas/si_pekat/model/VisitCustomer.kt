@@ -20,6 +20,9 @@ data class VisitCustomer(
     /** Nomor tiket (kolom Ticket_RP) bila ada — dipakai notifikasi. */
     val ticket: String = "",
 ) {
+    /** Layak muncul di daftar Kunjungan: tunggakan minimal [AppConfig.MIN_ARREARS_MONTHS] bulan (0 dan 1 disembunyikan). */
+    val eligibleForVisit: Boolean get() = bln >= com.jargas.si_pekat.config.AppConfig.MIN_ARREARS_MONTHS
+
     fun toMap(): JsonMap = buildMap {
         put("IDPEL", idpel)
         put("NAMA", nama)

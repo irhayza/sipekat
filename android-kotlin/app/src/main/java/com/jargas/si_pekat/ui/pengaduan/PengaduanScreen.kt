@@ -54,28 +54,15 @@ import com.jargas.si_pekat.core.ContactLauncher
 import com.jargas.si_pekat.core.sanitizeForSheet
 import com.jargas.si_pekat.data.ActivityHistory
 import com.jargas.si_pekat.data.AppSessionCache
-import com.jargas.si_pekat.data.KunjunganApiService
-import com.jargas.si_pekat.data.OcrApiService
 import com.jargas.si_pekat.data.PengaduanApiService
 import com.jargas.si_pekat.ui.components.AppTextField
 import com.jargas.si_pekat.ui.components.SectionCard
 import com.jargas.si_pekat.ui.components.SuccessSheet
 import com.jargas.si_pekat.ui.theme.AppColors
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 private const val MAX_CHARS = 200
 private val PHONE_REGEX = Regex("^(08|\\+62|62)\\d{7,12}$")
-
-/** Jalankan [block]; hasilnya null bila gagal. CancellationException tetap diteruskan agar debounce bisa membatalkan. */
-private suspend inline fun <T> attempt(block: () -> T): T? = try {
-    block()
-} catch (e: CancellationException) {
-    throw e
-} catch (e: Exception) {
-    null
-}
 
 private class SuccessInfo(val ticket: String, val overdue: Boolean)
 
@@ -106,6 +93,7 @@ fun PengaduanScreen(userName: String, userNama: String, onBack: () -> Unit) {
     var idStatus by remember { mutableStateOf("") }
     var idStatusColor by remember { mutableStateOf(AppColors.Muted) }
     var mrsValue by remember { mutableStateOf<String?>(null) }
+    var autoFilled by remember { mutableStateOf<Pair<String, String>?>(null) }
     var isLoading by remember { mutableStateOf(false) }
     var success by remember { mutableStateOf<SuccessInfo?>(null) }
 
@@ -122,44 +110,51 @@ fun PengaduanScreen(userName: String, userNama: String, onBack: () -> Unit) {
         it.idPelanggan.lowercase() == digits.lowercase() && it.status.uppercase() != "SELESAI"
     }
 
-    // ── Autofill saat ID diketik: cek tiket ganda lalu cari di dbase → dapell → get_customer_by_id ──
+    // ── Autofill nama & alamat saat ID diketik ──
+    // Urutan: (1) cache lokal dbase — instan, tanpa jaringan; (2) SATU panggilan server (get_customer_by_id) hanya bila
+    // ID sudah lengkap (semua IDPEL 10 digit) dan tidak ada di cache. Dulu: tunda 400 ms lalu sampai 3 panggilan berurutan
+    // (termasuk mengunduh seluruh sheet dbase ±3,7 MB) yang dipicu sejak 8 digit.
     LaunchedEffect(idText) {
         val digits = idText.filter { it.isDigit() }
-        if (digits.length < 8) {
-            idStatus = ""
-            return@LaunchedEffect
-        }
-        activeTicketFor(digits)?.let {
-            showSnack("Pelanggan ini masih punya tiket ${it.ticket} berstatus ${it.status}", isError = true)
+        val complete = digits.length >= AppConfig.CUSTOMER_ID_LENGTH
+
+        // ID diubah setelah autofill → hapus isian hasil autofill milik ID sebelumnya (kecuali sudah diedit petugas),
+        // supaya nama/alamat pelanggan lain tidak ikut terkirim bersama ID baru.
+        fun clearStaleAutofill() {
+            val af = autoFilled
+            if (af != null && nama == af.first && alamat == af.second) { nama = ""; alamat = "" }
+            autoFilled = null
         }
 
-        idStatus = "⏳ Mencari di dbase..."
-        idStatusColor = AppColors.Flame
-        delay(400) // debounce: dibatalkan otomatis bila ID berubah lagi
+        if (digits.isEmpty()) { clearStaleAutofill(); idStatus = ""; return@LaunchedEffect }
 
-        val row = attempt { KunjunganApiService.findRow(sheetName = AppConfig.OCR_SHEET_NAME, idpel = digits).row }
-        if (row != null && row.isNotEmpty()) {
-            nama = row["NAMA"]?.toString() ?: ""
-            alamat = row["ALAMAT"]?.toString() ?: ""
-            mrsValue = row["MRS"]?.toString()?.trim()?.uppercase()
+        // 1) Cache lokal
+        val local = AppSessionCache.findCustomerById(digits)
+        if (local != null) {
+            nama = local.nama
+            alamat = local.alamat
+            autoFilled = nama to alamat
+            mrsValue = null
             idStatus = "✅ Ditemukan"
             idStatusColor = AppColors.Selesai
+            if (complete) activeTicketFor(digits)?.let { showSnack("Pelanggan ini masih punya tiket ${it.ticket} berstatus ${it.status}", isError = true) }
             return@LaunchedEffect
         }
 
-        val dapel = attempt { OcrApiService.findCustomerInDapel(digits) }
-        if (dapel != null) {
-            nama = dapel.nama
-            alamat = dapel.alamat ?: ""
-            idStatus = "✅ Ditemukan (Dapel)"
-            idStatusColor = AppColors.Selesai
-            return@LaunchedEffect
-        }
+        clearStaleAutofill()
+        if (!complete) { idStatus = ""; return@LaunchedEffect }   // belum selesai diketik: jangan bebani server
 
-        val fallback = PengaduanApiService.checkCustomerId(digits)
-        if (fallback != null) {
-            nama = fallback.nama
-            alamat = fallback.alamat
+        activeTicketFor(digits)?.let { showSnack("Pelanggan ini masih punya tiket ${it.ticket} berstatus ${it.status}", isError = true) }
+
+        // 2) Server (cache belum memuat dbase / pelanggan baru)
+        idStatus = "⏳ Mencari di server..."
+        idStatusColor = AppColors.Flame
+        val server = PengaduanApiService.checkCustomerId(digits)
+        if (server != null) {
+            nama = server.nama
+            alamat = server.alamat
+            autoFilled = nama to alamat
+            mrsValue = null
             idStatus = "✅ Ditemukan"
             idStatusColor = AppColors.Selesai
         } else {
@@ -171,6 +166,7 @@ fun PengaduanScreen(userName: String, userNama: String, onBack: () -> Unit) {
     fun resetForm() {
         idText = ""; nama = ""; telp = ""; alamat = ""; pengaduan = ""
         mrsValue = null
+        autoFilled = null
         idStatus = ""
         idError = null; namaError = null; telpError = null; alamatError = null; pengaduanError = null
     }

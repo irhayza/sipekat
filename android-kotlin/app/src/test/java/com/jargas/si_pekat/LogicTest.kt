@@ -6,6 +6,7 @@ import com.jargas.si_pekat.core.normalizeComparable
 import com.jargas.si_pekat.core.sanitizeForSheet
 import com.jargas.si_pekat.data.MeterOcrParser
 import com.jargas.si_pekat.model.Ticket
+import com.jargas.si_pekat.model.VisitCustomer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -53,5 +54,13 @@ class LogicTest {
         assertEquals(listOf("Foto_Ses_RP"), missing)
         assertTrue(SheetColumns.warning(emptyList()) == null)
         assertTrue(SheetColumns.warning(missing)!!.contains("Foto_Ses_RP"))
+    }
+
+    @Test fun visitListHidesArrearsBelowTwoMonths() {
+        fun c(bln: Int) = VisitCustomer("1", "N", "A", "M", bln, 0.0, "Y")
+        assertFalse(c(0).eligibleForVisit)   // BLN kosong diparse sebagai 0
+        assertFalse(c(1).eligibleForVisit)
+        assertTrue(c(2).eligibleForVisit)
+        assertTrue(c(7).eligibleForVisit)
     }
 }
