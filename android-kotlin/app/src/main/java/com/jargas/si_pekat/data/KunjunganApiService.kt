@@ -102,7 +102,7 @@ object KunjunganApiService {
         val blnIndex = col("BLN", "BULAN")
         val rupiahIndex = col("RUPIAH", "TAGIHAN")
         val statusIndex = col("STATUS", "STATUS_RP")
-        val petugasIndex = col("PTGS_KJG", "PETUGAS", "PETUGAS ORDER", "NAMA PETUGAS", "Petugas_RP", "ptgs")
+        val petugasIndex = col("PTGS_KJG", "PETUGAS_KJG", "PETUGAS", "PETUGAS ORDER", "NAMA PETUGAS", "PERSONIL", "Petugas_RP", "ptgs")
         val kondisiIndex = col("KONDISI", "KETERANGAN", "PENGADUAN", "PENGADUAN_RP", "KONDISI_PR")
         val teleponIndex = col("TELEPON", "TELP", "TELFON", "NO HP", "NOHP", "HP", "WHATSAPP", "WA", "TELFON_RP")
         val latIndex = col("LAT", "LATITUDE", "Latitude_RP")
@@ -183,7 +183,9 @@ object KunjunganApiService {
                 }
                 // Kolom STATUS harus 'y'
                 if (statusIndex != null && cells[statusIndex].trim().lowercase() != "y") continue
-                if (!isAdmin && petugasIndex != null && normalizeComparable(cells[petugasIndex]) != normalizedPetugas) continue
+                if (!isAdmin) {
+                    if (petugasIndex == null || normalizeComparable(cells[petugasIndex]) != normalizedPetugas) continue
+                }
 
                 val candidate = build(kendala = cells.cell(kondisiIndex), alamat = cells.cell(alamatIndex))
                 // Tunggakan 0 dan 1 bulan tidak dikunjungi (BLN kosong dianggap 0).
@@ -209,8 +211,8 @@ object KunjunganApiService {
                         if (assigned == null || assigned != normalizedPetugas) continue
                     }
                 } else {
-                    if (!isAdmin && petugasIndex != null && petugasIndex < cells.size) {
-                        if (normalizeComparable(cells[petugasIndex]) != normalizedPetugas) continue
+                    if (!isAdmin) {
+                        if (petugasIndex == null || petugasIndex >= cells.size || normalizeComparable(cells[petugasIndex]) != normalizedPetugas) continue
                     }
                 }
 
