@@ -1,0 +1,4 @@
+# Salin menjadi local.properties (JANGAN di-commit). Hanya lokasi Android SDK.
+sdk.dir=/path/ke/Android/Sdk
+# Catatan: kunci API Gemini TIDAK disimpan di aplikasi. Isi di Google Apps Script →
+# Project Settings → Script Properties → GEMINI_API_KEY.

@@ -1,0 +1,123 @@
+🛠️ Kode Perbaikan (Code gs kotlin.gs)
+Berikut adalah perbaikan untuk fungsi processWahaUpdate_ dan doPost. Kode ini:
+
+Menerima event WAHA apa pun yang mengandung kata message (message, message.any, dll).
+
+Memperbaiki logika from === WA_ID agar tidak memblokir admin (cukup gunakan payload.fromMe === true untuk mencegah pesan bot membalas dirinya sendiri).
+
+Menyimpan log otomatis ke sheet Log di spreadsheet Base_Project untuk mempermudah pengecekan.
+
+JavaScript
+/**
+ * Entry point doPost yang disempurnakan
+ */
+function doPost(e) {
+  try {
+    if (!e || !e.postData || !e.postData.contents) {
+      return ContentService.createTextOutput('No payload');
+    }
+
+    const raw = e.postData.contents;
+    const payload = JSON.parse(raw);
+
+    // Deteksi fleksibel event WAHA
+    const isWaha = !!(payload.event && String(payload.event).includes('message') && payload.payload);
+
+    if (!isWaha) {
+      const secret = getPropSafe_('WEBHOOK_SECRET');
+      if (secret && e.parameter?.token !== secret) {
+        return ContentService.createTextOutput('Unauthorized');
+      }
+    }
+
+    if (isWaha) {
+      if (typeof processWahaUpdate_ === 'function') {
+        processWahaUpdate_(payload);
+      } else if (typeof LoggerService !== 'undefined') {
+        LoggerService.warn('processWahaUpdate_ is not defined, skipping webhook processing.');
+      }
+      return ContentService.createTextOutput('OK');
+    }
+
+    return ContentService.createTextOutput('Ignored non-waha event');
+  } catch (err) {
+    if (typeof LoggerService !== 'undefined') {
+      LoggerService.error('doPost error', err);
+    }
+    return ContentService.createTextOutput('Error: ' + err.toString());
+  }
+}
+
+/**
+ * Pemrosesan pesan WhatsApp yang telah diperbaiki
+ */
+function processWahaUpdate_(update) {
+  try {
+    const payload = update.payload;
+    if (!payload) return;
+
+    // 1. Abaikan pesan dari bot sendiri atau broadcast
+    if (payload.fromMe === true || payload.id?.fromMe === true) return;
+    
+    // 2. Dukung semua event pesan (message, message.any, message.upsert)
+    const eventName = String(update.event || '');
+    if (!eventName.includes('message')) return;
+
+    const rawText = payload.body || payload.text || payload.message?.conversation || payload.message?.extendedTextMessage?.text || '';
+    const text = normalizeText_(rawText);
+    const originalText = rawText.trim();
+    const from = String(payload.from || '').trim();
+
+    if (!text || from === 'status@broadcast') return;
+
+    // Cegah duplikasi webhook
+    if (typeof isDuplicateWaMessage_ === 'function' && isDuplicateWaMessage_(payload, update)) return;
+
+    const isAdmin = typeof isAdminChat_ === 'function' ? isAdminChat_(from) : false;
+
+    // Log ke sheet Log
+    if (typeof LoggerService !== 'undefined') {
+      LoggerService.info('WA Masuk Diterima', { from: from, admin: isAdmin, teks: originalText.substring(0, 100) });
+    }
+
+    // Perintah cek ID
+    if (text === '#id' || text === 'id') {
+      reply_(from, `🆔 ID WhatsApp Anda: <code>${from}</code>\n` +
+        (isAdmin ? '✅ Terdaftar sebagai *ADMIN*.' : '⚠️ *Bukan admin*. Tambahkan ID di atas ke Script Properties `ADMIN_ID` agar dikenali.'));
+      return;
+    }
+
+    if (text.startsWith('/link') || text.startsWith('#link')) { reply_(from, getPropSafe_('WEBAPP_URL')); return; }
+    if (text === '#ping' || text === 'ping') { reply_(from, '🏓 Pong! Bot aktif.'); return; }
+    if (text === '#menu' || text === 'menu') { sendMenu_(from); return; }
+
+    if (isAdmin) {
+      if (text === '1' || text === 'open') { replyOpenTickets_(from); return; }
+      if (text === '2' || text === 'pending') { replyPendingTickets_(from); return; }
+      if (text === '3' || text === 'rekap') { replyRekapHariIni_(from); return; }
+
+      const matchBalas = originalText.match(/^(?:#|SIPEKAT-)?(\d+)\s+([\s\S]+)/i);
+      if (matchBalas) {
+        handleBalasPengaduan_(from, matchBalas[1], matchBalas[2]);
+        return;
+      }
+
+      if (text.startsWith('ai ') || text.startsWith('gemini ')) {
+        handleGeminiAssistant_(from, originalText.replace(/^(ai|gemini)\s+/i, ''));
+        return;
+      }
+
+      // Default Admin: panggil Gemini Assistant
+      handleGeminiAssistant_(from, originalText);
+      return;
+    }
+
+    // Jalur Pelanggan Umum -> Gemini CS
+    handleGeminiCS_(from, originalText);
+
+  } catch (err) {
+    if (typeof LoggerService !== 'undefined') {
+      LoggerService.error('Error processWahaUpdate_', err);
+    }
+  }
+}
